@@ -47,7 +47,8 @@ apt install -y \
     i2c-tools \
     hdparm \
     smartmontools \
-    lshw
+    lshw \
+    xinput-calibrator
 
 # Function to check USB device
 check_usb_device() {
