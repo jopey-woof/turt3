@@ -1,0 +1,190 @@
+# Turtle Enclosure Scenes
+# Predefined environmental configurations
+
+# Optimal Day Scene
+optimal_day:
+  name: "Optimal Day Conditions"
+  entities:
+    input_boolean.day_mode:
+      state: "on"
+    input_boolean.auto_cooling:
+      state: "on"
+    switch.lighting_system:
+      state: "on"
+    switch.cooling_fan:
+      state: "off"
+    switch.misting_system:
+      state: "off"
+  icon: "mdi:weather-sunny"
+
+# Optimal Night Scene
+optimal_night:
+  name: "Optimal Night Conditions"
+  entities:
+    input_boolean.day_mode:
+      state: "off"
+    input_boolean.auto_cooling:
+      state: "on"
+    switch.lighting_system:
+      state: "off"
+    switch.cooling_fan:
+      state: "off"
+    switch.misting_system:
+      state: "off"
+  icon: "mdi:weather-night"
+
+# High Temperature Scene
+high_temperature:
+  name: "High Temperature Response"
+  entities:
+    input_boolean.auto_cooling:
+      state: "on"
+    switch.cooling_fan:
+      state: "on"
+    switch.misting_system:
+      state: "on"
+    switch.lighting_system:
+      state: "off"
+  icon: "mdi:thermometer-high"
+
+# Low Humidity Scene
+low_humidity:
+  name: "Low Humidity Response"
+  entities:
+    switch.misting_system:
+      state: "on"
+    switch.cooling_fan:
+      state: "off"
+    switch.lighting_system:
+      state: "on"
+  icon: "mdi:water-percent"
+
+# Emergency Cooling Scene
+emergency_cooling:
+  name: "Emergency Cooling"
+  entities:
+    switch.cooling_fan:
+      state: "on"
+    switch.misting_system:
+      state: "on"
+    switch.lighting_system:
+      state: "off"
+    input_boolean.auto_cooling:
+      state: "on"
+  icon: "mdi:snowflake-alert"
+
+# Maintenance Scene
+maintenance:
+  name: "Maintenance Mode"
+  entities:
+    input_boolean.maintenance_mode:
+      state: "on"
+    switch.cooling_fan:
+      state: "off"
+    switch.misting_system:
+      state: "off"
+    switch.lighting_system:
+      state: "off"
+    input_boolean.auto_cooling:
+      state: "off"
+    input_boolean.day_mode:
+      state: "off"
+  icon: "mdi:wrench"
+
+# All Systems Off Scene
+all_off:
+  name: "All Systems Off"
+  entities:
+    switch.cooling_fan:
+      state: "off"
+    switch.misting_system:
+      state: "off"
+    switch.lighting_system:
+      state: "off"
+    input_boolean.auto_cooling:
+      state: "off"
+    input_boolean.day_mode:
+      state: "off"
+    input_boolean.maintenance_mode:
+      state: "off"
+  icon: "mdi:power-off"
+
+# Basking Mode Scene
+basking_mode:
+  name: "Basking Mode"
+  entities:
+    switch.lighting_system:
+      state: "on"
+    switch.cooling_fan:
+      state: "off"
+    switch.misting_system:
+      state: "off"
+    input_boolean.auto_cooling:
+      state: "off"
+    input_boolean.day_mode:
+      state: "on"
+  icon: "mdi:weather-sunny"
+
+# Rest Mode Scene
+rest_mode:
+  name: "Rest Mode"
+  entities:
+    switch.lighting_system:
+      state: "off"
+    switch.cooling_fan:
+      state: "off"
+    switch.misting_system:
+      state: "off"
+    input_boolean.auto_cooling:
+      state: "on"
+    input_boolean.day_mode:
+      state: "off"
+  icon: "mdi:weather-night"
+
+# Monitoring Only Scene
+monitoring_only:
+  name: "Monitoring Only"
+  entities:
+    switch.cooling_fan:
+      state: "off"
+    switch.misting_system:
+      state: "off"
+    switch.lighting_system:
+      state: "off"
+    input_boolean.auto_cooling:
+      state: "off"
+    input_boolean.day_mode:
+      state: "off"
+  icon: "mdi:eye"
+
+# Energy Saving Scene
+energy_saving:
+  name: "Energy Saving Mode"
+  entities:
+    switch.lighting_system:
+      state: "off"
+    switch.cooling_fan:
+      state: "off"
+    switch.misting_system:
+      state: "off"
+    input_boolean.auto_cooling:
+      state: "off"
+    input_boolean.day_mode:
+      state: "off"
+  icon: "mdi:leaf"
+
+# Custom Scene Template
+custom_environment:
+  name: "Custom Environment"
+  entities:
+    input_boolean.day_mode:
+      state: "on"
+    input_boolean.auto_cooling:
+      state: "on"
+    switch.lighting_system:
+      state: "on"
+    switch.cooling_fan:
+      state: "off"
+    switch.misting_system:
+      state: "off"
+  icon: "mdi:tune" 

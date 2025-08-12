@@ -1,0 +1,169 @@
+# Turtle Enclosure Home Assistant Configuration
+# Main configuration file for Eastern Box Turtle monitoring system
+
+# Load packages
+homeassistant:
+  name: Turtle Enclosure
+  latitude: 40.7128  # Update with actual coordinates
+  longitude: -74.0060
+  elevation: 10
+  unit_system: imperial
+  time_zone: America/New_York
+  packages: !include_dir_named packages
+
+# Core integrations
+default_config:
+  # Core functionality
+  frontend:
+  http:
+  websocket_api:
+  api:
+  config:
+  device_automation:
+  scene:
+  script:
+  template:
+  zone:
+  person:
+  group:
+  input_boolean:
+  input_text:
+  input_number:
+  input_select:
+  input_datetime:
+  schedule:
+  timer:
+  counter:
+  input_text:
+  input_number:
+  input_select:
+  input_datetime:
+  schedule:
+  timer:
+  counter:
+
+# Logging
+logger:
+  default: info
+  logs:
+    custom_components: debug
+    homeassistant.components.zigbee: debug
+    homeassistant.components.usb: debug
+
+# HTTP configuration
+http:
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 127.0.0.1
+    - ::1
+  cors_allowed_origins:
+    - "http://localhost:8123"
+    - "http://127.0.0.1:8123"
+
+# Frontend configuration
+frontend:
+  themes: !include_dir_merge_named themes
+
+# Automation and script loading
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
+
+# Integration configurations
+# Zigbee integration
+zha:
+  usb_path: /dev/zigbee-dongle
+  database_path: /config/zigbee.db
+  enable_quirks: true
+
+# Camera integration
+camera:
+  - platform: generic
+    name: Turtle Camera
+    still_image_url: http://localhost:8080/snapshot
+    stream_source: http://localhost:8080/stream
+
+# USB sensor integration (with fallback for missing TEMPerHUM)
+sensor:
+  # TEMPerHUM sensor (will work when hardware arrives)
+  - platform: command_line
+    name: Temperature
+    command: "python3 /config/temperhum_reader.py"
+    unit_of_measurement: "°F"
+    scan_interval: 30
+    value_template: "{{ value.split(',')[0] | float if value != '0.0,0.0' else 75.0 }}"
+    
+  - platform: command_line
+    name: Humidity
+    command: "python3 /config/temperhum_reader.py"
+    unit_of_measurement: "%"
+    scan_interval: 30
+    value_template: "{{ value.split(',')[1] | float if value != '0.0,0.0' else 70.0 }}"
+    
+  # Fallback sensors for when TEMPerHUM is not available
+  - platform: template
+    sensors:
+      temperature_fallback:
+        friendly_name: "Temperature (Fallback)"
+        unit_of_measurement: "°F"
+        value_template: >
+          {% if states('sensor.temperature') | float > 0 %}
+            {{ states('sensor.temperature') | float }}
+          {% else %}
+            75.0
+          {% endif %}
+        availability_template: "{{ states('sensor.temperature') | float > 0 }}"
+        
+      humidity_fallback:
+        friendly_name: "Humidity (Fallback)"
+        unit_of_measurement: "%"
+        value_template: >
+          {% if states('sensor.humidity') | float > 0 %}
+            {{ states('sensor.humidity') | float }}
+          {% else %}
+            70.0
+          {% endif %}
+        availability_template: "{{ states('sensor.humidity') | float > 0 }}"
+
+# Notifications
+notify:
+  - name: mobile_app
+    platform: mobile_app
+  - name: email
+    platform: smtp
+    server: smtp.gmail.com
+    port: 587
+    username: !secret email_username
+    password: !secret email_password
+    sender: !secret email_sender
+    recipient: !secret email_recipient
+    encryption: starttls
+
+# Lovelace dashboard
+lovelace:
+  mode: storage
+  dashboards:
+    turtle-dashboard:
+      mode: storage
+      title: Turtle Enclosure
+      icon: mdi:turtle
+      show_in_sidebar: true
+      require_admin: false
+
+# Input controls for system management
+input_boolean:
+  day_mode:
+    name: "Day Mode"
+    icon: "mdi:weather-sunny"
+  auto_cooling:
+    name: "Auto Cooling"
+    icon: "mdi:snowflake"
+  maintenance_mode:
+    name: "Maintenance Mode"
+    icon: "mdi:wrench"
+  health_check_running:
+    name: "Health Check Running"
+    icon: "mdi:heart-pulse"
+
+# Include secrets
+secrets: !include secrets.yaml 

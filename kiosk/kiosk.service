@@ -1,0 +1,19 @@
+[Unit]
+Description=Turtle Enclosure Kiosk Display
+After=network.target graphical-session.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=turtle
+Group=turtle
+Environment=DISPLAY=:0
+Environment=XAUTHORITY=/home/turtle/.Xauthority
+ExecStartPre=/bin/sleep 10
+ExecStart=/usr/bin/chromium-browser --kiosk --disable-web-security --user-data-dir=/home/turtle/.config/chromium-kiosk --no-first-run --no-default-browser-check --disable-features=VizDisplayCompositor --disable-dev-shm-usage http://localhost:8123
+ExecStop=/usr/bin/pkill chromium
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target 

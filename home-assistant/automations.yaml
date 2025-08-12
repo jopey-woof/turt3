@@ -1,0 +1,267 @@
+# Turtle Enclosure Automations
+# Environmental monitoring and control automations
+
+# Critical Temperature Alerts
+- alias: "Critical Temperature Alert - Too Hot"
+  description: "Alert when temperature exceeds safe range"
+  trigger:
+    platform: numeric_state
+    entity_id: sensor.temperature_fallback
+    above: 90
+  condition:
+    - condition: time
+      after: "06:00:00"
+      before: "22:00:00"
+  action:
+    - service: notify.mobile_app
+      data:
+        title: "🐢 CRITICAL: Temperature Too High!"
+        message: "Temperature is {{ states('sensor.temperature') }}°F - Immediate action needed!"
+        data:
+          priority: high
+          channel: critical_alerts
+    - service: notify.email
+      data:
+        title: "Turtle Enclosure - Critical Temperature Alert"
+        message: "Temperature has reached {{ states('sensor.temperature') }}°F. Please check cooling systems immediately."
+
+- alias: "Critical Temperature Alert - Too Cold"
+  description: "Alert when temperature drops below safe range"
+  trigger:
+    platform: numeric_state
+    entity_id: sensor.temperature_fallback
+    below: 65
+  action:
+    - service: notify.mobile_app
+      data:
+        title: "🐢 CRITICAL: Temperature Too Low!"
+        message: "Temperature is {{ states('sensor.temperature') }}°F - Heating needed!"
+        data:
+          priority: high
+          channel: critical_alerts
+    - service: notify.email
+      data:
+        title: "Turtle Enclosure - Critical Temperature Alert"
+        message: "Temperature has dropped to {{ states('sensor.temperature') }}°F. Please check heating systems."
+
+# Humidity Alerts
+- alias: "Critical Humidity Alert - Too Low"
+  description: "Alert when humidity drops below safe range"
+  trigger:
+    platform: numeric_state
+    entity_id: sensor.humidity_fallback
+    below: 55
+  action:
+    - service: notify.mobile_app
+      data:
+        title: "💧 CRITICAL: Humidity Too Low!"
+        message: "Humidity is {{ states('sensor.humidity') }}% - Misting needed!"
+        data:
+          priority: high
+          channel: critical_alerts
+
+- alias: "Critical Humidity Alert - Too High"
+  description: "Alert when humidity exceeds safe range"
+  trigger:
+    platform: numeric_state
+    entity_id: sensor.humidity_fallback
+    above: 85
+  action:
+    - service: notify.mobile_app
+      data:
+        title: "💧 CRITICAL: Humidity Too High!"
+        message: "Humidity is {{ states('sensor.humidity') }}% - Ventilation needed!"
+        data:
+          priority: high
+          channel: critical_alerts
+
+# Warning Alerts (Less Critical)
+- alias: "Temperature Warning - Approaching Limits"
+  description: "Warning when temperature approaches limits"
+  trigger:
+    platform: numeric_state
+    entity_id: sensor.temperature_fallback
+    above: 85
+    below: 90
+  action:
+    - service: notify.mobile_app
+      data:
+        title: "🌡️ WARNING: Temperature High"
+        message: "Temperature is {{ states('sensor.temperature') }}°F - Monitor closely"
+        data:
+          priority: normal
+          channel: warnings
+
+- alias: "Humidity Warning - Approaching Limits"
+  description: "Warning when humidity approaches limits"
+  trigger:
+    platform: numeric_state
+    entity_id: sensor.humidity_fallback
+    above: 75
+    below: 85
+  action:
+    - service: notify.mobile_app
+      data:
+        title: "💧 WARNING: Humidity High"
+        message: "Humidity is {{ states('sensor.humidity') }}% - Monitor closely"
+        data:
+          priority: normal
+          channel: warnings
+
+# Day/Night Cycle Automation
+- alias: "Day Mode - Morning"
+  description: "Switch to day mode at sunrise"
+  trigger:
+    platform: sun
+    event: sunrise
+  action:
+    - service: input_boolean.turn_on
+      target:
+        entity_id: input_boolean.day_mode
+    - service: notify.mobile_app
+      data:
+        title: "🌅 Day Mode Activated"
+        message: "Turtle enclosure switched to day mode"
+        data:
+          priority: low
+          channel: info
+
+- alias: "Night Mode - Evening"
+  description: "Switch to night mode at sunset"
+  trigger:
+    platform: sun
+    event: sunset
+  action:
+    - service: input_boolean.turn_off
+      target:
+        entity_id: input_boolean.day_mode
+    - service: notify.mobile_app
+      data:
+        title: "🌙 Night Mode Activated"
+        message: "Turtle enclosure switched to night mode"
+        data:
+          priority: low
+          channel: info
+
+# Equipment Failure Detection
+- alias: "Smart Plug Failure Detection"
+  description: "Detect when smart plugs lose power unexpectedly"
+  trigger:
+    platform: state
+    entity_id: 
+      - switch.cooling_fan
+      - switch.misting_system
+      - switch.lighting_system
+    to: "unavailable"
+  action:
+    - service: notify.mobile_app
+      data:
+        title: "⚡ EQUIPMENT FAILURE!"
+        message: "{{ trigger.entity_id }} has lost connection - Check power and connectivity"
+        data:
+          priority: high
+          channel: critical_alerts
+
+# Daily Status Report
+- alias: "Daily Turtle Status Report"
+  description: "Send daily status report at 9 AM"
+  trigger:
+    platform: time
+    at: "09:00:00"
+  action:
+    - service: notify.mobile_app
+      data:
+        title: "🐢 Daily Turtle Status Report"
+        message: |
+          Temperature: {{ states('sensor.temperature_fallback') }}°F
+          Humidity: {{ states('sensor.humidity_fallback') }}%
+          Mode: {{ 'Day' if is_state('input_boolean.day_mode', 'on') else 'Night' }}
+          All systems: {{ '✅ Normal' if states('sensor.temperature_fallback')|float < 90 and states('sensor.temperature_fallback')|float > 65 else '⚠️ Check needed' }}
+        data:
+          priority: normal
+          channel: daily_reports
+
+# Auto-cooling when temperature is high
+- alias: "Auto-cooling Activation"
+  description: "Automatically activate cooling when temperature is high"
+  trigger:
+    platform: numeric_state
+    entity_id: sensor.temperature_fallback
+    above: 85
+  condition:
+    - condition: state
+      entity_id: input_boolean.auto_cooling
+      state: "on"
+  action:
+    - service: switch.turn_on
+      target:
+        entity_id: switch.cooling_fan
+    - service: notify.mobile_app
+      data:
+        title: "❄️ Auto-cooling Activated"
+        message: "Cooling fan turned on due to high temperature"
+        data:
+          priority: normal
+          channel: info
+
+# Auto-cooling deactivation
+- alias: "Auto-cooling Deactivation"
+  description: "Turn off cooling when temperature normalizes"
+  trigger:
+    platform: numeric_state
+    entity_id: sensor.temperature_fallback
+    below: 80
+  condition:
+    - condition: state
+      entity_id: switch.cooling_fan
+      state: "on"
+    - condition: state
+      entity_id: input_boolean.auto_cooling
+      state: "on"
+  action:
+    - service: switch.turn_off
+      target:
+        entity_id: switch.cooling_fan
+    - service: notify.mobile_app
+      data:
+        title: "❄️ Auto-cooling Deactivated"
+        message: "Cooling fan turned off - temperature normalized"
+        data:
+          priority: normal
+          channel: info
+
+# TEMPerHUM Sensor Status Monitoring
+- alias: "TEMPerHUM Sensor Connected"
+  description: "Notify when TEMPerHUM sensor becomes available"
+  trigger:
+    platform: state
+    entity_id: sensor.temperature
+    to: "75.0"
+    from: "0.0"
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.temperature
+      above: 0
+  action:
+    - service: notify.mobile_app
+      data:
+        title: "🌡️ TEMPerHUM Sensor Connected!"
+        message: "Temperature and humidity sensors are now working with real data"
+        data:
+          priority: normal
+          channel: info
+
+- alias: "TEMPerHUM Sensor Disconnected"
+  description: "Notify when TEMPerHUM sensor becomes unavailable"
+  trigger:
+    platform: state
+    entity_id: sensor.temperature
+    to: "0.0"
+  action:
+    - service: notify.mobile_app
+      data:
+        title: "⚠️ TEMPerHUM Sensor Disconnected"
+        message: "Using fallback values until sensor is reconnected"
+        data:
+          priority: normal
+          channel: warnings 

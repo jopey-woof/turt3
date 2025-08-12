@@ -1,0 +1,219 @@
+# Turtle Enclosure Theme
+# Nature-inspired theme with organic colors and turtle aesthetics
+
+turtle-theme:
+  # Primary Colors - Natural Earth Tones
+  primary-color: "#2d5016"  # Forest Green
+  primary-background-color: "#f4f1e8"  # Warm Cream
+  secondary-background-color: "#e8dcc0"  # Shell Amber
+  text-primary-color: "#2d5016"  # Forest Green
+  text-secondary-color: "#5a4a3f"  # Rich Brown
+  
+  # Accent Colors
+  accent-color: "#8b4513"  # Saddle Brown
+  divider-color: "#d2b48c"  # Tan
+  
+  # Status Colors
+  state-icon-active-color: "#2d5016"  # Forest Green
+  state-icon-inactive-color: "#8b7355"  # Muted Brown
+  state-icon-unavailable-color: "#a0522d"  # Sienna
+  
+  # Card Colors
+  card-background-color: "#faf8f3"  # Light Cream
+  card-rgb-color: "250, 248, 243"
+  card-background-opacity: 0.9
+  
+  # Header Colors
+  app-header-background-color: "#2d5016"  # Forest Green
+  app-header-text-color: "#f4f1e8"  # Warm Cream
+  sidebar-icon-color: "#f4f1e8"  # Warm Cream
+  sidebar-text-color: "#f4f1e8"  # Warm Cream
+  sidebar-selected-icon-color: "#8b4513"  # Saddle Brown
+  sidebar-selected-text-color: "#8b4513"  # Saddle Brown
+  
+  # Button Colors
+  button-primary-color: "#2d5016"  # Forest Green
+  button-primary-text-color: "#f4f1e8"  # Warm Cream
+  button-secondary-color: "#8b4513"  # Saddle Brown
+  button-secondary-text-color: "#f4f1e8"  # Warm Cream
+  
+  # Input Colors
+  input-fill-color: "#faf8f3"  # Light Cream
+  input-disabled-color: "#e8dcc0"  # Shell Amber
+  input-border-color: "#d2b48c"  # Tan
+  
+  # Switch Colors
+  switch-checked-color: "#2d5016"  # Forest Green
+  switch-unchecked-color: "#8b7355"  # Muted Brown
+  
+  # Temperature/Humidity Specific Colors
+  temperature-color: "#d2691e"  # Chocolate Orange
+  humidity-color: "#4682b4"  # Steel Blue
+  pressure-color: "#708090"  # Slate Gray
+  
+  # Alert Colors
+  error-color: "#dc143c"  # Crimson
+  warning-color: "#ff8c00"  # Dark Orange
+  info-color: "#4682b4"  # Steel Blue
+  success-color: "#228b22"  # Forest Green
+  
+  # Custom CSS for turtle-themed elements
+  ha-card-border-radius: "12px"
+  ha-card-box-shadow: "0 4px 8px rgba(45, 80, 22, 0.1)"
+  
+  # Custom CSS Variables
+  --turtle-shell-pattern: "radial-gradient(circle at 30% 30%, #8b4513 0%, #a0522d 25%, #cd853f 50%, #deb887 75%, #f5deb3 100%)"
+  --leaf-pattern: "linear-gradient(45deg, #2d5016 0%, #3a5f1f 25%, #4a6b2a 50%, #5a7a35 75%, #6a8940 100%)"
+  --water-ripple: "radial-gradient(circle, rgba(70, 130, 180, 0.3) 0%, rgba(70, 130, 180, 0.1) 50%, transparent 100%)"
+  
+  # Font Settings
+  --turtle-font: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
+  --turtle-font-size-large: "24px"
+  --turtle-font-size-medium: "18px"
+  --turtle-font-size-small: "14px"
+  
+  # Animation Settings
+  --turtle-transition: "all 0.3s ease-in-out"
+  --turtle-hover-scale: "1.02"
+  
+  # Custom CSS for enhanced turtle theming
+  ha-card:
+    border-radius: "12px"
+    box-shadow: "0 4px 12px rgba(45, 80, 22, 0.15)"
+    transition: "all 0.3s ease-in-out"
+    background: "linear-gradient(135deg, #faf8f3 0%, #f4f1e8 100%)"
+    
+  ha-card:hover:
+    transform: "translateY(-2px)"
+    box-shadow: "0 6px 16px rgba(45, 80, 22, 0.2)"
+    
+  .temperature-card:
+    background: "linear-gradient(135deg, #fff8dc 0%, #f5deb3 100%)"
+    border-left: "4px solid #d2691e"
+    
+  .humidity-card:
+    background: "linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%)"
+    border-left: "4px solid #4682b4"
+    
+  .camera-card:
+    background: "linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%)"
+    border-left: "4px solid #708090"
+    
+  .control-card:
+    background: "linear-gradient(135deg, #f0fff0 0%, #e8f5e8 100%)"
+    border-left: "4px solid #228b22"
+    
+  .alert-card:
+    background: "linear-gradient(135deg, #fff5f5 0%, #ffe6e6 100%)"
+    border-left: "4px solid #dc143c"
+    
+  # Turtle-themed button styles
+  mwc-button:
+    border-radius: "8px"
+    font-weight: "600"
+    text-transform: "none"
+    transition: "all 0.3s ease-in-out"
+    
+  mwc-button:hover:
+    transform: "scale(1.02)"
+    box-shadow: "0 4px 8px rgba(45, 80, 22, 0.2)"
+    
+  # Custom icon colors for turtle theme
+  .turtle-icon:
+    color: "#2d5016"
+    
+  .temperature-icon:
+    color: "#d2691e"
+    
+  .humidity-icon:
+    color: "#4682b4"
+    
+  .camera-icon:
+    color: "#708090"
+    
+  .control-icon:
+    color: "#228b22"
+    
+  # Status indicators with turtle shell pattern
+  .status-indicator:
+    background: "var(--turtle-shell-pattern)"
+    border-radius: "50%"
+    width: "12px"
+    height: "12px"
+    display: "inline-block"
+    margin-right: "8px"
+    
+  # Leaf-shaped progress bars
+  .leaf-progress:
+    background: "var(--leaf-pattern)"
+    border-radius: "8px"
+    height: "8px"
+    overflow: "hidden"
+    
+  # Water ripple effects for humidity
+  .water-ripple:
+    background: "var(--water-ripple)"
+    border-radius: "50%"
+    animation: "ripple 2s infinite"
+    
+  @keyframes ripple:
+    0%:
+      transform: "scale(1)"
+      opacity: "0.8"
+    50%:
+      transform: "scale(1.1)"
+      opacity: "0.4"
+    100%:
+      transform: "scale(1)"
+      opacity: "0.8"
+      
+  # Gentle leaf sway animation
+  .leaf-sway:
+    animation: "sway 3s ease-in-out infinite"
+    
+  @keyframes sway:
+    0%, 100%:
+      transform: "rotate(0deg)"
+    50%:
+      transform: "rotate(2deg)"
+      
+  # Shell pattern background for main areas
+  .shell-background:
+    background: "var(--turtle-shell-pattern)"
+    opacity: "0.05"
+    position: "absolute"
+    top: "0"
+    left: "0"
+    right: "0"
+    bottom: "0"
+    z-index: "-1"
+    
+  # Touch-optimized button sizes
+  .touch-button:
+    min-height: "48px"
+    min-width: "48px"
+    font-size: "18px"
+    padding: "12px 16px"
+    border-radius: "8px"
+    
+  # Large, readable text for touchscreen
+  .touch-text:
+    font-size: "20px"
+    line-height: "1.4"
+    font-weight: "500"
+    
+  # Enhanced focus states for accessibility
+  .focus-visible:
+    outline: "2px solid #2d5016"
+    outline-offset: "2px"
+    
+  # Seasonal color variations
+  .day-mode:
+    --primary-color: "#2d5016"
+    --accent-color: "#8b4513"
+    
+  .night-mode:
+    --primary-color: "#1a3d0f"
+    --accent-color: "#5a4a3f"
+    --card-background-color: "#2a2a2a"
+    --text-primary-color: "#f4f1e8" 

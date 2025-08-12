@@ -1,0 +1,238 @@
+# Turtle Enclosure Scripts
+# Manual control scripts for device management
+
+# Emergency Cooling Script
+emergency_cooling:
+  alias: "Emergency Cooling"
+  description: "Activate all cooling systems immediately"
+  fields:
+    duration:
+      description: "Duration to run cooling (minutes)"
+      example: 30
+  sequence:
+    - service: switch.turn_on
+      target:
+        entity_id: switch.cooling_fan
+    - service: switch.turn_on
+      target:
+        entity_id: switch.misting_system
+    - delay:
+        minutes: "{{ duration | default(30) }}"
+    - service: switch.turn_off
+      target:
+        entity_id: switch.cooling_fan
+    - service: switch.turn_off
+      target:
+        entity_id: switch.misting_system
+    - service: notify.mobile_app
+      data:
+        title: "❄️ Emergency Cooling Complete"
+        message: "Cooling systems have been turned off after {{ duration | default(30) }} minutes"
+
+# Manual Misting Script
+manual_misting:
+  alias: "Manual Misting"
+  description: "Activate misting system for specified duration"
+  fields:
+    duration:
+      description: "Duration to run misting (seconds)"
+      example: 30
+  sequence:
+    - service: switch.turn_on
+      target:
+        entity_id: switch.misting_system
+    - delay:
+        seconds: "{{ duration | default(30) }}"
+    - service: switch.turn_off
+      target:
+        entity_id: switch.misting_system
+    - service: notify.mobile_app
+      data:
+        title: "💧 Manual Misting Complete"
+        message: "Misting system ran for {{ duration | default(30) }} seconds"
+
+# System Health Check Script
+system_health_check:
+  alias: "System Health Check"
+  description: "Perform comprehensive system health check"
+  sequence:
+    - service: input_boolean.turn_on
+      target:
+        entity_id: input_boolean.health_check_running
+    - service: notify.mobile_app
+      data:
+        title: "🔍 System Health Check Started"
+        message: "Checking all system components..."
+    - delay:
+        seconds: 5
+    - service: python_script.system_health_check
+    - service: input_boolean.turn_off
+      target:
+        entity_id: input_boolean.health_check_running
+
+# Day Mode Script
+day_mode:
+  alias: "Day Mode"
+  description: "Activate day mode settings"
+  sequence:
+    - service: input_boolean.turn_on
+      target:
+        entity_id: input_boolean.day_mode
+    - service: switch.turn_on
+      target:
+        entity_id: switch.lighting_system
+    - service: input_boolean.turn_off
+      target:
+        entity_id: input_boolean.auto_cooling
+    - service: notify.mobile_app
+      data:
+        title: "🌅 Day Mode Activated"
+        message: "Day mode settings applied - lighting on, auto-cooling off"
+
+# Night Mode Script
+night_mode:
+  alias: "Night Mode"
+  description: "Activate night mode settings"
+  sequence:
+    - service: input_boolean.turn_off
+      target:
+        entity_id: input_boolean.day_mode
+    - service: switch.turn_off
+      target:
+        entity_id: switch.lighting_system
+    - service: input_boolean.turn_on
+      target:
+        entity_id: input_boolean.auto_cooling
+    - service: notify.mobile_app
+      data:
+        title: "🌙 Night Mode Activated"
+        message: "Night mode settings applied - lighting off, auto-cooling on"
+
+# All Systems Off Script
+all_systems_off:
+  alias: "All Systems Off"
+  description: "Turn off all automated systems"
+  sequence:
+    - service: switch.turn_off
+      target:
+        entity_id: 
+          - switch.cooling_fan
+          - switch.misting_system
+          - switch.lighting_system
+    - service: input_boolean.turn_off
+      target:
+        entity_id:
+          - input_boolean.auto_cooling
+          - input_boolean.day_mode
+    - service: notify.mobile_app
+      data:
+        title: "⏹️ All Systems Off"
+        message: "All automated systems have been turned off"
+
+# Reset System Script
+reset_system:
+  alias: "Reset System"
+  description: "Reset all system settings to defaults"
+  sequence:
+    - service: input_boolean.turn_off
+      target:
+        entity_id:
+          - input_boolean.auto_cooling
+          - input_boolean.day_mode
+          - input_boolean.health_check_running
+    - service: switch.turn_off
+      target:
+        entity_id:
+          - switch.cooling_fan
+          - switch.misting_system
+          - switch.lighting_system
+    - delay:
+        seconds: 5
+    - service: input_boolean.turn_on
+      target:
+        entity_id: input_boolean.day_mode
+    - service: notify.mobile_app
+      data:
+        title: "🔄 System Reset Complete"
+        message: "All systems have been reset to default settings"
+
+# Test Notifications Script
+test_notifications:
+  alias: "Test Notifications"
+  description: "Test all notification systems"
+  sequence:
+    - service: notify.mobile_app
+      data:
+        title: "🧪 Mobile Notification Test"
+        message: "This is a test of the mobile notification system"
+        data:
+          priority: normal
+          channel: test
+    - delay:
+        seconds: 2
+    - service: notify.email
+      data:
+        title: "Turtle Enclosure - Notification Test"
+        message: "This is a test of the email notification system"
+    - service: notify.mobile_app
+      data:
+        title: "✅ Notification Test Complete"
+        message: "All notification systems have been tested"
+
+# Camera Snapshot Script
+camera_snapshot:
+  alias: "Camera Snapshot"
+  description: "Take a snapshot from the turtle camera"
+  sequence:
+    - service: camera.snapshot
+      target:
+        entity_id: camera.turtle_camera
+      data:
+        filename: /config/www/turtle_snapshot_{{ now().strftime('%Y%m%d_%H%M%S') }}.jpg
+    - service: notify.mobile_app
+      data:
+        title: "📸 Camera Snapshot Taken"
+        message: "A new snapshot has been saved"
+
+# Data Export Script
+export_data:
+  alias: "Export Data"
+  description: "Export sensor data for analysis"
+  sequence:
+    - service: python_script.export_sensor_data
+    - service: notify.mobile_app
+      data:
+        title: "📊 Data Export Complete"
+        message: "Sensor data has been exported for analysis"
+
+# Maintenance Mode Script
+maintenance_mode:
+  alias: "Maintenance Mode"
+  description: "Enter maintenance mode (disable automations)"
+  sequence:
+    - service: input_boolean.turn_on
+      target:
+        entity_id: input_boolean.maintenance_mode
+    - service: automation.turn_off
+      target:
+        entity_id: all
+    - service: notify.mobile_app
+      data:
+        title: "🔧 Maintenance Mode Activated"
+        message: "All automations have been disabled for maintenance"
+
+# Exit Maintenance Mode Script
+exit_maintenance_mode:
+  alias: "Exit Maintenance Mode"
+  description: "Exit maintenance mode (re-enable automations)"
+  sequence:
+    - service: input_boolean.turn_off
+      target:
+        entity_id: input_boolean.maintenance_mode
+    - service: automation.turn_on
+      target:
+        entity_id: all
+    - service: notify.mobile_app
+      data:
+        title: "✅ Maintenance Mode Deactivated"
+        message: "All automations have been re-enabled" 
