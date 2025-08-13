@@ -119,9 +119,9 @@ notify:
 # Lovelace dashboard
 lovelace:
   mode: storage
+  filename: ui-lovelace.yaml
   dashboards:
     turtle-dashboard:
-      mode: storage
       title: Turtle Enclosure
       icon: mdi:turtle
       show_in_sidebar: true

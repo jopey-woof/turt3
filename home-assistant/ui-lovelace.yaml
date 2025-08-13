@@ -1,0 +1,32 @@
+# Turtle Enclosure Dashboard
+# Basic Lovelace UI configuration
+
+title: Turtle Enclosure
+views:
+  - title: Overview
+    path: overview
+    type: custom:grid-layout
+    badges: []
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: entities
+            title: System Status
+            entities:
+              - entity: input_boolean.day_mode
+              - entity: input_boolean.auto_cooling
+              - entity: input_boolean.maintenance_mode
+              - entity: input_boolean.health_check_running
+            show_header_toggle: false
+            
+          - type: entities
+            title: Environmental Conditions
+            entities:
+              - entity: sensor.temperature
+              - entity: sensor.humidity
+            show_header_toggle: false
+            
+          - type: picture-entity
+            entity: camera.turtle_camera
+            name: Live Camera Feed
+            camera_view: live 
