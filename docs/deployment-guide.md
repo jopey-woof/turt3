@@ -148,25 +148,23 @@ Configure the camera in:
 
 ### Step 8: Touchscreen Calibration
 
-**Automatic Calibration**: The system will automatically attempt touchscreen calibration after the kiosk starts. This happens in the background during the first boot.
+**One-Time Automatic Calibration**: The system will automatically calibrate the touchscreen on the first boot after deployment. Calibration values are saved permanently and reused on subsequent boots.
+
+**What happens:**
+1. **First boot** - Automatic calibration runs in background
+2. **Calibration values saved** - Stored permanently in `/opt/turtle-enclosure/saved_calibration.conf`
+3. **Future boots** - Saved values applied automatically, no recalibration needed
 
 **Manual Calibration** (if needed):
-1. **Reboot the system**:
-   ```bash
-   sudo reboot
-   ```
+```bash
+# Reset saved calibration values
+turtle-reset-calibration
 
-2. **SSH in again and run calibration**:
-   ```bash
-   turtle-calibrate
-   ```
+# Run manual calibration
+turtle-calibrate
+```
 
-3. **Follow on-screen instructions**:
-   - Touch each crosshair as accurately as possible
-   - Complete the calibration process
-   - Reboot the system to apply changes
-
-**Note**: The `turtle-calibrate` command automatically handles all X11 authorization issues and works for any user. No manual steps required.
+**Note**: Once calibrated, the touchscreen will work perfectly on all future boots without needing recalibration.
 
 ### Step 9: Configure Dashboard
 
