@@ -11,8 +11,8 @@ Group=turtle
 Environment=DISPLAY=:0
 Environment=XAUTHORITY=/home/turtle/.Xauthority
 ExecStartPre=/bin/sleep 10
-ExecStartPre=/bin/bash -c 'until curl -s http://localhost:8123 > /dev/null; do echo "Waiting for Home Assistant..."; sleep 5; done'
-ExecStart=/usr/bin/chromium-browser --kiosk --disable-web-security --user-data-dir=/home/turtle/.config/chromium-kiosk --no-first-run --no-default-browser-check --disable-features=VizDisplayCompositor --disable-dev-shm-usage http://localhost:8123
+ExecStartPre=/bin/bash -c 'until curl -s http://localhost:8123 > /dev/null || curl -s http://127.0.0.1:8123 > /dev/null || curl -s http://10.0.20.69:8123 > /dev/null; do echo "Waiting for Home Assistant..."; sleep 5; done'
+ExecStart=/bin/bash -c 'HA_URL=""; if curl -s http://localhost:8123 > /dev/null; then HA_URL="http://localhost:8123"; elif curl -s http://127.0.0.1:8123 > /dev/null; then HA_URL="http://127.0.0.1:8123"; elif curl -s http://10.0.20.69:8123 > /dev/null; then HA_URL="http://10.0.20.69:8123"; else HA_URL="http://localhost:8123"; fi; /usr/bin/chromium-browser --kiosk --disable-web-security --user-data-dir=/home/turtle/.config/chromium-kiosk --no-first-run --no-default-browser-check --disable-features=VizDisplayCompositor --disable-dev-shm-usage "$HA_URL"'
 ExecStop=/usr/bin/pkill chromium
 Restart=always
 RestartSec=10
