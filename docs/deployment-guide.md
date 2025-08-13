@@ -150,22 +150,24 @@ Configure the camera in:
 
 After deployment, you may need to calibrate the touchscreen for accurate touch input:
 
-1. **Switch to turtle user**:
+1. **Reboot the system**:
    ```bash
-   sudo su - turtle
+   sudo reboot
    ```
 
-2. **Run the calibration script**:
+2. **Wait for kiosk to start** (about 30-60 seconds)
+
+3. **SSH in again and run calibration**:
    ```bash
-   ./kiosk/calibrate-after-startup.sh
+   turtle-calibrate
    ```
 
-3. **Follow on-screen instructions**:
+4. **Follow on-screen instructions**:
    - Touch each crosshair as accurately as possible
    - Complete the calibration process
    - Reboot the system to apply changes
 
-**Note**: If you encounter X11 authorization errors, ensure you're running from the turtle user's graphical session. The calibration cannot run during the deployment process itself.
+**Note**: The calibration script works with any user and automatically handles X11 authorization. It will work whether you're deploying via SSH or locally.
 
 ### Step 9: Configure Dashboard
 
@@ -322,38 +324,33 @@ xinput_calibrator
 #### Touchscreen Calibration Issues
 If you encounter "Authorization required, but no authorization protocol specified" errors:
 
-1. **Ensure you're in the correct session**:
+1. **Use the foolproof calibration script**:
    ```bash
-   # Switch to turtle user
-   sudo su - turtle
+   turtle-calibrate
+   ```
+
+2. **If that doesn't work, try the temporary script**:
+   ```bash
+   sudo /tmp/run_calibration.sh
+   ```
+
+3. **Manual troubleshooting**:
+   ```bash
+   # Check if kiosk is running
+   sudo systemctl status kiosk
    
-   # Check if display is available
+   # Check if display manager is running
+   sudo systemctl status lightdm
+   
+   # Check display availability
    echo $DISPLAY
    xrandr --listmonitors
    ```
 
-2. **Run calibration from kiosk session**:
-   ```bash
-   # From turtle user session
-   ./kiosk/calibrate-after-startup.sh
-   ```
-
-3. **Alternative: Manual calibration**:
-   ```bash
-   # Set display environment
-   export DISPLAY=:0
-   export XAUTHORITY=/home/turtle/.Xauthority
-   
-   # Run calibration
-   xinput_calibrator --output-type xinput
-   ```
-
 4. **If still having issues**:
-   - Reboot the system: `sudo reboot`
-   - Let the kiosk session start automatically
-   - Press `Ctrl+Alt+F1` to switch to console
-   - Login as turtle user
-   - Run the calibration script again
+   - Ensure the kiosk session has started: `sudo systemctl status kiosk`
+   - Wait 30-60 seconds after reboot for full startup
+   - Try running calibration again: `turtle-calibrate`
 
 ### Getting Help
 
