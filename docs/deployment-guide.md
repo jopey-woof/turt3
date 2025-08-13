@@ -146,7 +146,28 @@ Configure the camera in:
    - They should appear in the Zigbee integration
    - Rename them appropriately (e.g., "Cooling Fan", "Misting System")
 
-### Step 8: Configure Dashboard
+### Step 8: Touchscreen Calibration
+
+After deployment, you may need to calibrate the touchscreen for accurate touch input:
+
+1. **Switch to turtle user**:
+   ```bash
+   sudo su - turtle
+   ```
+
+2. **Run the calibration script**:
+   ```bash
+   ./kiosk/calibrate-after-startup.sh
+   ```
+
+3. **Follow on-screen instructions**:
+   - Touch each crosshair as accurately as possible
+   - Complete the calibration process
+   - Reboot the system to apply changes
+
+**Note**: If you encounter X11 authorization errors, ensure you're running from the turtle user's graphical session. The calibration cannot run during the deployment process itself.
+
+### Step 9: Configure Dashboard
 
 1. **Access Lovelace**:
    - **Configuration** → **Dashboards** → **Turtle Enclosure**
@@ -297,6 +318,42 @@ xinput test-xi2 --root
 sudo apt install xinput-calibrator
 xinput_calibrator
 ```
+
+#### Touchscreen Calibration Issues
+If you encounter "Authorization required, but no authorization protocol specified" errors:
+
+1. **Ensure you're in the correct session**:
+   ```bash
+   # Switch to turtle user
+   sudo su - turtle
+   
+   # Check if display is available
+   echo $DISPLAY
+   xrandr --listmonitors
+   ```
+
+2. **Run calibration from kiosk session**:
+   ```bash
+   # From turtle user session
+   ./kiosk/calibrate-after-startup.sh
+   ```
+
+3. **Alternative: Manual calibration**:
+   ```bash
+   # Set display environment
+   export DISPLAY=:0
+   export XAUTHORITY=/home/turtle/.Xauthority
+   
+   # Run calibration
+   xinput_calibrator --output-type xinput
+   ```
+
+4. **If still having issues**:
+   - Reboot the system: `sudo reboot`
+   - Let the kiosk session start automatically
+   - Press `Ctrl+Alt+F1` to switch to console
+   - Login as turtle user
+   - Run the calibration script again
 
 ### Getting Help
 
