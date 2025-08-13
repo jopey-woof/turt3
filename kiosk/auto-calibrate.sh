@@ -95,7 +95,7 @@ if ! xrandr --listmonitors > /dev/null 2>&1; then
 #!/bin/bash
 export DISPLAY=:0
 export XAUTHORITY=/home/turtle/.Xauthority
-xinput_calibrator --output-type xinput
+xinput_calibrator
 EOF
     
     chmod +x /tmp/calibrate_as_turtle.sh
@@ -136,7 +136,7 @@ echo "🎯 Touch each crosshair as accurately as possible"
 echo ""
 
 # Run the calibration
-xinput_calibrator --output-type xinput
+xinput_calibrator
 
 echo ""
 echo "✅ Calibration complete!"

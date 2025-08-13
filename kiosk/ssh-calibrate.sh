@@ -132,7 +132,7 @@ echo "🎯 Touch each crosshair as accurately as possible"
 echo ""
 
 # Run the calibration
-xinput_calibrator --output-type xinput
+xinput_calibrator
 
 echo ""
 echo "✅ Calibration complete!"
