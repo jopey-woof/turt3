@@ -10,43 +10,8 @@ echo "🐢 Configuring Turtle Enclosure Display..."
 # Create X11 configuration directory
 sudo mkdir -p /etc/X11/xorg.conf.d
 
-# Create display configuration
-cat > /tmp/10-touchscreen.conf << 'EOF'
-Section "InputClass"
-    Identifier "Touchscreen"
-    MatchIsTouchscreen "on"
-    MatchDevicePath "/dev/input/event*"
-    Driver "libinput"
-    Option "Tapping" "on"
-    Option "TappingButtonMap" "lrm"
-    Option "NaturalScrolling" "true"
-    Option "ScrollMethod" "twofinger"
-EndSection
-
-Section "Monitor"
-    Identifier "Touchscreen"
-    Option "PreferredMode" "1024x600"
-    Option "Primary" "true"
-EndSection
-
-Section "Screen"
-    Identifier "Screen0"
-    Monitor "Touchscreen"
-    DefaultDepth 24
-    SubSection "Display"
-        Depth 24
-        Modes "1024x600"
-    EndSubSection
-EndSection
-
-Section "Device"
-    Identifier "Card0"
-    Driver "modesetting"
-    Option "AccelMethod" "glamor"
-EndSection
-EOF
-
-sudo mv /tmp/10-touchscreen.conf /etc/X11/xorg.conf.d/
+# Copy the improved touchscreen configuration
+sudo cp 10-touchscreen.conf /etc/X11/xorg.conf.d/
 
 # Create user for kiosk mode
 if ! id "turtle" &>/dev/null; then
