@@ -1,0 +1,17 @@
+[Unit]
+Description=Turtle Enclosure Auto-Calibration Service
+After=kiosk.service
+Wants=kiosk.service
+
+[Service]
+Type=oneshot
+User=turtle
+Group=turtle
+Environment=DISPLAY=:0
+Environment=XAUTHORITY=/home/turtle/.Xauthority
+ExecStart=/opt/turtle-enclosure/auto-calibrate-service.sh
+RemainAfterExit=yes
+TimeoutStartSec=300
+
+[Install]
+WantedBy=multi-user.target 

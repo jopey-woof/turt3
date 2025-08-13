@@ -148,8 +148,9 @@ Configure the camera in:
 
 ### Step 8: Touchscreen Calibration
 
-After deployment, you may need to calibrate the touchscreen for accurate touch input:
+**Automatic Calibration**: The system will automatically attempt touchscreen calibration after the kiosk starts. This happens in the background during the first boot.
 
+**Manual Calibration** (if needed):
 1. **Reboot the system**:
    ```bash
    sudo reboot
