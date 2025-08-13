@@ -11,36 +11,13 @@ homeassistant:
   time_zone: America/New_York
   packages: !include_dir_named packages
 
-# Core integrations
+# Core integrations (explicitly listed to avoid cloud integration)
 default_config:
-  # Core functionality
-  frontend:
-  http:
-  websocket_api:
-  api:
-  config:
-  device_automation:
-  scene:
-  script:
-  template:
-  zone:
-  person:
-  group:
-  input_boolean:
-  input_text:
-  input_number:
-  input_select:
-  input_datetime:
-  schedule:
-  timer:
-  counter:
-  input_text:
-  input_number:
-  input_select:
-  input_datetime:
-  schedule:
-  timer:
-  counter:
+
+# Explicitly exclude cloud integration to prevent Zeroconf conflicts
+# Cloud integration is disabled for local turtle enclosure system
+cloud:
+  enabled: false
 
 # Logging
 logger:
