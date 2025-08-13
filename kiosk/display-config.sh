@@ -11,7 +11,7 @@ echo "🐢 Configuring Turtle Enclosure Display..."
 sudo mkdir -p /etc/X11/xorg.conf.d
 
 # Copy the improved touchscreen configuration
-sudo cp 10-touchscreen.conf /etc/X11/xorg.conf.d/
+sudo cp "$(dirname "$0")/10-touchscreen.conf" /etc/X11/xorg.conf.d/
 
 # Create user for kiosk mode
 if ! id "turtle" &>/dev/null; then
