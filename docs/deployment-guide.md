@@ -155,19 +155,22 @@ After deployment, you may need to calibrate the touchscreen for accurate touch i
    sudo reboot
    ```
 
-2. **Wait for kiosk to start** (about 30-60 seconds)
-
-3. **SSH in again and run calibration**:
+2. **SSH in again and run automatic calibration**:
    ```bash
-   turtle-calibrate
+   turtle-wait-calibrate
    ```
 
-4. **Follow on-screen instructions**:
+3. **Follow on-screen instructions**:
    - Touch each crosshair as accurately as possible
    - Complete the calibration process
    - Reboot the system to apply changes
 
-**Note**: The calibration script works with any user and automatically handles X11 authorization. It will work whether you're deploying via SSH or locally.
+**Alternative**: If you want to calibrate manually:
+```bash
+turtle-calibrate
+```
+
+**Note**: The `turtle-wait-calibrate` command automatically waits for the system to be ready, making it foolproof for remote deployment.
 
 ### Step 9: Configure Dashboard
 

@@ -25,6 +25,38 @@ if ! command -v xinput_calibrator &> /dev/null; then
     sudo apt install -y xinput-calibrator
 fi
 
+# Wait for kiosk service to be fully active
+echo "⏳ Waiting for kiosk service to be ready..."
+MAX_WAIT=120  # 2 minutes max wait
+WAIT_COUNT=0
+
+while [ $WAIT_COUNT -lt $MAX_WAIT ]; do
+    KIOSK_STATUS=$(systemctl is-active kiosk 2>/dev/null || echo "unknown")
+    
+    if [ "$KIOSK_STATUS" = "active" ]; then
+        echo "✅ Kiosk service is active"
+        break
+    elif [ "$KIOSK_STATUS" = "activating" ]; then
+        echo "⏳ Kiosk service is still starting... (${WAIT_COUNT}s)"
+        sleep 2
+        WAIT_COUNT=$((WAIT_COUNT + 2))
+    else
+        echo "❌ Kiosk service is not running. Status: $KIOSK_STATUS"
+        echo "💡 Please ensure the system has been deployed and rebooted."
+        exit 1
+    fi
+done
+
+if [ $WAIT_COUNT -ge $MAX_WAIT ]; then
+    echo "❌ Timeout waiting for kiosk service to start"
+    echo "💡 Please check kiosk service status: sudo systemctl status kiosk"
+    exit 1
+fi
+
+# Additional wait for X11 session to be fully ready
+echo "⏳ Waiting for X11 session to be ready..."
+sleep 10
+
 # Set up display environment
 export DISPLAY=:0
 
@@ -76,21 +108,19 @@ fi
 
 # Final check if we can access the display
 if ! xrandr --listmonitors > /dev/null 2>&1; then
-    echo "❌ Cannot access display. Please ensure:"
-    echo "   1. The kiosk session is running (sudo systemctl status kiosk)"
-    echo "   2. You're running this after the system has booted and kiosk started"
-    echo "   3. The display manager (lightdm) is running"
-    echo ""
-    echo "💡 Try these steps:"
-    echo "   1. Reboot: sudo reboot"
-    echo "   2. Wait 30-60 seconds for kiosk to start"
-    echo "   3. SSH in again and run this script"
+    echo "❌ Cannot access display after waiting for kiosk to start."
     echo ""
     echo "🔍 Debug info:"
     echo "   Display: $DISPLAY"
     echo "   XAUTHORITY: $XAUTHORITY"
     echo "   LightDM running: $(pgrep -x "lightdm" > /dev/null && echo "Yes" || echo "No")"
     echo "   Kiosk service: $(systemctl is-active kiosk 2>/dev/null || echo "Unknown")"
+    echo "   Turtle user exists: $(id turtle >/dev/null 2>&1 && echo "Yes" || echo "No")"
+    echo ""
+    echo "💡 Try these steps:"
+    echo "   1. Check kiosk logs: sudo journalctl -u kiosk -n 20"
+    echo "   2. Restart kiosk: sudo systemctl restart kiosk"
+    echo "   3. Wait 30 seconds and try again: turtle-calibrate"
     exit 1
 fi
 
