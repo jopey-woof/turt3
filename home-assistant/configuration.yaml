@@ -14,8 +14,7 @@ homeassistant:
 # Core integrations (explicitly listed to avoid cloud integration)
 default_config:
 
-# Explicitly exclude cloud integration to prevent Zeroconf conflicts
-# Cloud integration is disabled for local turtle enclosure system
+# Explicitly disable cloud integration to prevent Zeroconf conflicts
 cloud:
   enabled: false
 
@@ -47,9 +46,8 @@ script: !include scripts.yaml
 scene: !include scenes.yaml
 
 # Integration configurations
-# Zigbee integration
+# Zigbee integration (updated to remove deprecated usb_path)
 zha:
-  usb_path: /dev/zigbee-dongle
   database_path: /config/zigbee.db
   enable_quirks: true
 
@@ -116,16 +114,9 @@ notify:
     recipient: !secret email_recipient
     encryption: starttls
 
-# Lovelace dashboard
+# Lovelace dashboard (simplified configuration)
 lovelace:
   mode: storage
-  filename: ui-lovelace.yaml
-  dashboards:
-    turtle-dashboard:
-      title: Turtle Enclosure
-      icon: mdi:turtle
-      show_in_sidebar: true
-      require_admin: false
 
 # Input controls for system management
 input_boolean:
