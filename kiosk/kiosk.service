@@ -1,7 +1,8 @@
 [Unit]
 Description=Turtle Enclosure Kiosk Display
-After=network.target graphical-session.target
+After=network.target graphical-session.target docker.service
 Wants=network.target
+Requires=docker.service
 
 [Service]
 Type=simple
@@ -10,10 +11,11 @@ Group=turtle
 Environment=DISPLAY=:0
 Environment=XAUTHORITY=/home/turtle/.Xauthority
 ExecStartPre=/bin/sleep 10
+ExecStartPre=/bin/bash -c 'until curl -s http://localhost:8123 > /dev/null; do echo "Waiting for Home Assistant..."; sleep 5; done'
 ExecStart=/usr/bin/chromium-browser --kiosk --disable-web-security --user-data-dir=/home/turtle/.config/chromium-kiosk --no-first-run --no-default-browser-check --disable-features=VizDisplayCompositor --disable-dev-shm-usage http://localhost:8123
 ExecStop=/usr/bin/pkill chromium
 Restart=always
-RestartSec=5
+RestartSec=10
 
 [Install]
 WantedBy=multi-user.target 
