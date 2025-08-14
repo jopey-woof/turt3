@@ -101,21 +101,54 @@ else
     echo "⚠️  Automatic calibration failed or timed out."
     echo "💡 Manual calibration may be needed: turtle-calibrate"
     
-    # Check if it was a timeout and try with pre-calibrated values
+    # Check if it was a timeout and try with known calibration values
     if grep -q "Timeout waiting for hardware cmd interrupt" /tmp/auto_calibration.log 2>/dev/null; then
-        echo "🔧 Hardware timeout detected. Trying with pre-calibrated values..."
-        timeout 60 xinput_calibrator --precalib 0 65535 0 65535 2>&1 | tee /tmp/precalib_calibration.log
+        echo "🔧 Hardware timeout detected. Applying known calibration values..."
         
-        if [ $? -eq 0 ]; then
-            echo "✅ Pre-calibrated values applied successfully!"
-            
-            # Save the pre-calibrated values
-            if [ -f /etc/X11/xorg.conf.d/99-calibration.conf ]; then
-                sudo cp /etc/X11/xorg.conf.d/99-calibration.conf "$CALIBRATION_FILE"
-                sudo chmod 644 "$CALIBRATION_FILE"
-                echo "✅ Pre-calibrated values saved for future use"
-            fi
-        fi
+        # Get current resolution for auto-detection
+        CURRENT_RESOLUTION=$(xrandr --current | grep '*' | awk '{print $1}' | head -1)
+        echo "   Detected resolution: $CURRENT_RESOLUTION"
+        
+        # Apply known calibration based on resolution
+        case $CURRENT_RESOLUTION in
+            "1024x600")
+                CALIBRATION_MATRIX="1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0"
+                echo "   Applying 10.1\" touchscreen calibration values..."
+                ;;
+            "800x480")
+                CALIBRATION_MATRIX="1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0"
+                echo "   Applying 7\" touchscreen calibration values..."
+                ;;
+            "1024x768")
+                CALIBRATION_MATRIX="1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0"
+                echo "   Applying 8\" touchscreen calibration values..."
+                ;;
+            "1280x800")
+                CALIBRATION_MATRIX="1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0"
+                echo "   Applying 12\" touchscreen calibration values..."
+                ;;
+            *)
+                CALIBRATION_MATRIX="1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0"
+                echo "   Applying default calibration values..."
+                ;;
+        esac
+        
+        # Create and apply known calibration
+        cat > /tmp/known_calibration.conf << EOF
+Section "InputClass"
+    Identifier "Touchscreen Calibration"
+    MatchProduct "yldzkj USB2IIC_CTP_CONTROL"
+    Option "CalibrationMatrix" "$CALIBRATION_MATRIX"
+EndSection
+EOF
+        
+        sudo cp /tmp/known_calibration.conf /etc/X11/xorg.conf.d/99-calibration.conf
+        sudo cp /tmp/known_calibration.conf "$CALIBRATION_FILE"
+        sudo chmod 644 "$CALIBRATION_FILE"
+        rm -f /tmp/known_calibration.conf
+        
+        echo "✅ Known calibration values applied successfully!"
+        echo "✅ Calibration values saved for future use"
     fi
 fi
 
