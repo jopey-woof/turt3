@@ -1,0 +1,14 @@
+{
+    "window.commandCenter": true,
+    "python.terminal.shellIntegration.enabled": true,
+    "git.autofetch": true,
+    "terminal.integrated.defaultProfile.linux": "bash",
+    "terminal.integrated.profiles.linux": {
+        "bash": {
+            "path": "/usr/bin/bash",
+            "args": ["-l"]
+        }
+    },
+    "terminal.integrated.enablePersistentSessions": false,
+    "terminal.integrated.shellIntegration.enabled": true
+} 
