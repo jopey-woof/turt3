@@ -1,0 +1,21 @@
+[Unit]
+Description=Turtle Enclosure Kiosk Display
+After=network.target graphical-session.target
+Wants=graphical-session.target
+
+[Service]
+Type=simple
+User=turtle
+Group=turtle
+Environment=DISPLAY=:0
+Environment=XAUTHORITY=/home/turtle/.Xauthority
+Environment=PATH=/usr/bin:/usr/local/bin
+WorkingDirectory=/home/turtle
+ExecStartPre=/bin/bash -c 'sleep 5'
+ExecStart=/bin/bash -c 'export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1001/bus; /usr/bin/chromium-browser --display=:0 --kiosk --user-data-dir=/tmp/chrome-kiosk --disable-web-security --disable-features=VizDisplayCompositor --disable-dev-shm-usage --no-sandbox --disable-setuid-sandbox --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-renderer-backgrounding --disable-features=TranslateUI --disable-ipc-flooding-protection --disable-hang-monitor --disable-prompt-on-repost --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-default-apps --disable-extensions --disable-sync --disable-translate --hide-scrollbars --metrics-recording-only --mute-audio --no-first-run --safebrowsing-disable-auto-update --ignore-certificate-errors --ignore-ssl-errors --ignore-certificate-errors-spki-list "http://localhost:8123?kiosk"'
+ExecStop=/bin/bash -c 'pkill -f chromium-browser'
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=graphical.target 
