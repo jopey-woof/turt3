@@ -31,8 +31,20 @@ turtle-enclosure-system/
 ### Prerequisites
 - Ubuntu Server 22.04 LTS
 - Docker installed and running
-- Home Assistant container running
 - Hardware connected (see hardware setup guide)
+
+### ⚠️ Important: Configuration Required
+
+**Before deployment, you must configure several values in the system files:**
+
+1. **Email credentials** for notifications
+2. **System passwords** for security
+3. **Camera credentials** (if required)
+4. **Home Assistant token** (after initial setup)
+
+**📋 Use our configuration checklist**: [`docs/configuration-checklist.md`](docs/configuration-checklist.md)
+
+**📖 Full deployment guide**: [`docs/deployment-guide.md`](docs/deployment-guide.md)
 
 ### Deployment Steps
 
@@ -42,21 +54,39 @@ turtle-enclosure-system/
    cd turtle-enclosure-system
    ```
 
-2. **Run Deployment Script**
+2. **Configure Required Values**
+   ```bash
+   # Edit secrets file
+   nano home-assistant/secrets.yaml
+   
+   # Edit deployment script
+   nano scripts/deploy.sh
+   
+   # Edit Docker passwords
+   nano docker/docker-compose.yml
+   ```
+
+3. **Run Deployment Script**
    ```bash
    chmod +x scripts/deploy.sh
    sudo ./scripts/deploy.sh
    ```
 
-3. **Configure Hardware**
+4. **Configure Hardware**
    ```bash
    sudo ./scripts/setup-hardware.sh
    ```
 
-4. **Restart Services**
+5. **Generate Home Assistant Token**
+   - Access Home Assistant at `http://your-server-ip:8123`
+   - Complete initial setup
+   - Generate long-lived access token
+   - Update secrets file and restart
+
+6. **Restart Services**
    ```bash
    sudo systemctl restart kiosk
-   sudo systemctl restart home-assistant
+   cd /opt/homeassistant && docker-compose restart
    ```
 
 ## 📋 Hardware Requirements
