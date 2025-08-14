@@ -80,42 +80,45 @@ setup_touchscreen() {
     sudo cp kiosk/10-touchscreen.conf /etc/X11/xorg.conf.d/
     sudo chmod 644 /etc/X11/xorg.conf.d/10-touchscreen.conf
     
-    # Apply working calibration for 10.1" screens by default
-    print_status "Applying default 10.1\" touchscreen calibration..."
+    # Apply known good calibration for 10.1" screens to fix vertical scaling issues
+    print_status "Applying known good 10.1\" touchscreen calibration..."
     sudo mkdir -p /etc/X11/xorg.conf.d/
     
-    # Create the calibration configuration with our working matrix
-    cat > /tmp/99-touchscreen-calibration.conf << 'EOF'
-Section "InputClass"
-    Identifier "Touchscreen Calibration"
-    MatchProduct "yldzkj USB2IIC_CTP_CONTROL"
-    Option "Coordinate Transformation Matrix" "1.0 0.0 0.0 0.0 0.8 0.0 0.0 0.0 1.0"
-EndSection
-EOF
+    # Backup current configuration
+    if [ -f /etc/X11/xorg.conf.d/10-touchscreen.conf ]; then
+        sudo cp /etc/X11/xorg.conf.d/10-touchscreen.conf /etc/X11/xorg.conf.d/10-touchscreen.conf.backup.$(date +%Y%m%d_%H%M%S)
+    fi
     
-    sudo mv /tmp/99-touchscreen-calibration.conf /etc/X11/xorg.conf.d/
-    sudo chmod 644 /etc/X11/xorg.conf.d/99-touchscreen-calibration.conf
+    # Apply the known good calibration matrix that fixes vertical scaling issues
+    # This matrix (1.0 0.0 0.0 0.0 0.8 0.0 0.0 0.0 1.0) fixes the issue where
+    # vertical scaling gets worse as you move down the screen
+    print_status "Applying calibration matrix to fix vertical scaling issues..."
+    sudo sed -i 's|Option "CalibrationMatrix" ""|Option "CalibrationMatrix" "1.0 0.0 0.0 0.0 0.8 0.0 0.0 0.0 1.0"|' /etc/X11/xorg.conf.d/10-touchscreen.conf
     
-    print_success "Default 10.1\" touchscreen calibration applied"
-    print_status "Calibration matrix: 1.0 0.0 0.0 0.0 0.8 0.0 0.0 0.0 1.0"
-    print_status "This fixes vertical misalignment for 1024x600 screens"
+    # Verify the change was applied
+    if grep -q 'CalibrationMatrix "1.0 0.0 0.0 0.0 0.8 0.0 0.0 0.0 1.0"' /etc/X11/xorg.conf.d/10-touchscreen.conf; then
+        print_success "Known good calibration matrix applied successfully!"
+        print_status "Calibration matrix: 1.0 0.0 0.0 0.0 0.8 0.0 0.0 0.0 1.0"
+        print_status "This fixes vertical scaling issues that get worse as you move down the screen"
+    else
+        print_warning "Failed to apply calibration matrix automatically"
+        print_status "Manual calibration may be required after deployment"
+    fi
     
-    # Check if calibration already exists and merge if needed
+    # Save calibration for future use
+    sudo mkdir -p /opt/turtle-enclosure
+    sudo cp /etc/X11/xorg.conf.d/10-touchscreen.conf /opt/turtle-enclosure/saved_calibration.conf
+    sudo chmod 644 /opt/turtle-enclosure/saved_calibration.conf
+    
+    # Remove any conflicting calibration files
     if [ -f /etc/X11/xorg.conf.d/99-calibration.conf ]; then
-        print_status "Existing calibration file found. Merging with touchscreen configuration..."
-        
-        # Read the calibration matrix from the existing file
-        CALIBRATION_MATRIX=$(grep "CalibrationMatrix" /etc/X11/xorg.conf.d/99-calibration.conf | cut -d'"' -f2)
-        
-        if [ -n "$CALIBRATION_MATRIX" ]; then
-            # Update our touchscreen config with the calibration matrix
-            sudo sed -i "s/Option \"Coordinate Transformation Matrix\" \".*\"/Option \"Coordinate Transformation Matrix\" \"$CALIBRATION_MATRIX\"/" /etc/X11/xorg.conf.d/99-touchscreen-calibration.conf
-            print_success "Calibration matrix merged with touchscreen configuration"
-        fi
-        
-        # Remove the separate calibration file to avoid conflicts
         sudo rm /etc/X11/xorg.conf.d/99-calibration.conf
-        print_success "Removed separate calibration file to prevent conflicts"
+        print_success "Removed conflicting calibration file"
+    fi
+    
+    if [ -f /etc/X11/xorg.conf.d/99-touchscreen-calibration.conf ]; then
+        sudo rm /etc/X11/xorg.conf.d/99-touchscreen-calibration.conf
+        print_success "Removed old touchscreen calibration file"
     fi
 }
 
