@@ -4,7 +4,7 @@
 # This script continuously moves the cursor off-screen to hide it
 
 export DISPLAY=:0
-export XAUTHORITY=/home/shrimp/.Xauthority
+export XAUTHORITY=/home/$(whoami)/.Xauthority
 
 # Disable screen saver and power management
 xset -dpms

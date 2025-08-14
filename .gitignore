@@ -1,0 +1,52 @@
+# Turtle Enclosure System .gitignore
+
+# Sensitive configuration files
+secrets.yaml
+*.key
+*.pem
+*.crt
+*.p12
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# Log files
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+/tmp/
+/temp/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Docker volumes
+docker/volumes/
+
+# Home Assistant runtime files
+home-assistant/.storage/
+home-assistant/.HA_VERSION
+
+# SSH keys
+ssh_keys/
+*.pub
+
+# Local configuration overrides
+local_config/ 

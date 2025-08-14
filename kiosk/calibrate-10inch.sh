@@ -12,13 +12,14 @@ echo "================================="
 export DISPLAY=:0
 
 # Copy X11 authorization if needed
-if [ ! -f "/home/shrimp/.Xauthority" ]; then
+CURRENT_USER=$(whoami)
+if [ ! -f "/home/$CURRENT_USER/.Xauthority" ]; then
     echo "🔑 Setting up X11 authorization..."
-    sudo cp /var/run/lightdm/root/:0 /home/shrimp/.Xauthority 2>/dev/null || true
-    sudo chown shrimp:shrimp /home/shrimp/.Xauthority 2>/dev/null || true
+    sudo cp /var/run/lightdm/root/:0 /home/$CURRENT_USER/.Xauthority 2>/dev/null || true
+    sudo chown $CURRENT_USER:$CURRENT_USER /home/$CURRENT_USER/.Xauthority 2>/dev/null || true
 fi
 
-export XAUTHORITY=/home/shrimp/.Xauthority
+export XAUTHORITY=/home/$CURRENT_USER/.Xauthority
 
 # Apply calibration for 10.1" screen (1024x600)
 echo "🎯 Applying 10.1\" touchscreen calibration..."

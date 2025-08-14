@@ -77,7 +77,7 @@ services:
     environment:
       - DOCKER_INFLUXDB_INIT_MODE=setup
       - DOCKER_INFLUXDB_INIT_USERNAME=admin
-      - DOCKER_INFLUXDB_INIT_PASSWORD=turtle123
+      - DOCKER_INFLUXDB_INIT_PASSWORD=your_influxdb_password
       - DOCKER_INFLUXDB_INIT_ORG=turtle-enclosure
       - DOCKER_INFLUXDB_INIT_BUCKET=turtle-data
       - TZ=America/New_York
@@ -95,7 +95,7 @@ services:
       - "3000:3000"
     environment:
       - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=turtle123
+      - GF_SECURITY_ADMIN_PASSWORD=your_grafana_password
       - GF_USERS_ALLOW_SIGN_UP=false
       - TZ=America/New_York
     depends_on:
