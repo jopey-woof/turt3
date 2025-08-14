@@ -9,17 +9,27 @@ You now have a complete, production-ready Turtle Enclosure Automation System tha
 ```
 turtle-enclosure-system/
 ├── README.md                           # Main project documentation
+├── .gitignore                          # Git ignore rules for sensitive files
 ├── kiosk/                              # Display and touchscreen configuration
 │   ├── kiosk.service                   # Systemd service for auto-boot kiosk
 │   ├── autologin.conf                  # Auto-login configuration
-│   └── display-config.sh               # Display setup script
+│   ├── 10-touchscreen.conf             # Touchscreen configuration
+│   ├── calibrate-10inch.sh             # 10.1" screen calibration script
+│   ├── hide-cursor.sh                  # Cursor hiding script
+│   ├── apply-known-calibration.sh      # Known calibration application
+│   ├── auto-calibrate-service.sh       # Automatic calibration service
+│   ├── auto-calibrate.service          # Systemd service for auto-calibration
+│   ├── known-calibrations.conf         # Known calibration values
+│   └── ha-config.conf                  # Home Assistant connection config
 ├── hardware/                           # Hardware device configurations
 │   └── udev-rules.conf                 # USB device udev rules
 ├── home-assistant/                     # Home Assistant configurations
 │   ├── configuration.yaml              # Main HA configuration
 │   ├── automations.yaml                # Environmental automations
 │   ├── scripts.yaml                    # Manual control scripts
-│   └── scenes.yaml                     # Predefined environmental scenes
+│   ├── scenes.yaml                     # Predefined environmental scenes
+│   ├── ui-lovelace.yaml                # Dashboard configuration
+│   └── secrets.yaml                    # Secrets template (configure before deployment)
 ├── themes/                             # Custom CSS themes
 │   └── turtle-theme.yaml               # Turtle-themed interface design
 ├── scripts/                            # Deployment and utility scripts
@@ -29,6 +39,7 @@ turtle-enclosure-system/
 │   └── docker-compose.yml              # Complete container setup
 └── docs/                               # Documentation
     ├── deployment-guide.md             # Step-by-step deployment guide
+    ├── configuration-checklist.md      # Configuration tracking checklist
     ├── troubleshooting.md              # Comprehensive troubleshooting guide
     └── setup-summary.md                # This summary document
 ```
@@ -58,12 +69,20 @@ git push -u origin main
 git clone https://github.com/yourusername/turtle-enclosure-system.git
 cd turtle-enclosure-system
 
+# Configure required values first (see configuration-checklist.md)
+nano home-assistant/secrets.yaml
+nano scripts/deploy.sh
+nano docker/docker-compose.yml
+
 # Run deployment
 chmod +x scripts/deploy.sh
 sudo ./scripts/deploy.sh
 
 # Configure hardware
 sudo ./scripts/setup-hardware.sh
+
+# Generate Home Assistant token and update secrets
+# (see deployment-guide.md for detailed steps)
 
 # Reboot to apply changes
 sudo reboot
@@ -186,6 +205,7 @@ Your Turtle Enclosure System is now complete and ready for deployment! The syste
 - Systemd services for kiosk mode
 - Udev rules for hardware devices
 - Docker Compose for container management
+- Placeholder values for all sensitive information (secure by default)
 
 ### ✅ Deployment Scripts
 - Automated installation and configuration
@@ -209,7 +229,7 @@ Your Turtle Enclosure System is now complete and ready for deployment! The syste
 
 1. **Push to GitHub**: Upload all files to your repository
 2. **Deploy to Remote Machine**: Follow the deployment guide
-3. **Configure Secrets**: Update email and API credentials
+3. **Configure Required Values**: Update email, passwords, and API credentials (see configuration-checklist.md)
 4. **Test All Components**: Verify hardware and software functionality
 5. **Customize Interface**: Adjust themes and dashboard layout
 6. **Monitor and Maintain**: Use the provided tools for ongoing management

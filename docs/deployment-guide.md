@@ -452,9 +452,10 @@ If you encounter "Authorization required, but no authorization protocol specifie
    turtle-calibrate
    ```
 
-2. **If that doesn't work, try the temporary script**:
+2. **If that doesn't work, try manual calibration**:
    ```bash
-   sudo /tmp/run_calibration.sh
+   sudo apt install xinput-calibrator
+   xinput_calibrator
    ```
 
 3. **Manual troubleshooting**:

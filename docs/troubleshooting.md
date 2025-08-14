@@ -74,8 +74,7 @@ xinput list
 xinput test-xi2 --root
 
 # Recalibrate touchscreen
-sudo apt install xinput-calibrator
-xinput_calibrator
+turtle-calibrate
 
 # Check touch device permissions
 ls -la /dev/input/event*
