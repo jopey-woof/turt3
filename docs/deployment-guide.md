@@ -26,9 +26,127 @@ Ensure all hardware is connected before deployment:
 
 > **Note**: The TEMPerHUM sensor is optional for initial deployment. The system will use safe fallback values (75°F, 70% humidity) until the sensor is connected. You'll receive a notification when the sensor becomes available.
 
+## ⚙️ Pre-Deployment Configuration
+
+**IMPORTANT**: Before running the deployment script, you need to configure several values. The system uses placeholder values that must be updated with your actual information.
+
+### Required Configuration Values
+
+You'll need to configure these values in the files below:
+
+1. **Email Configuration** (for notifications):
+   - Gmail address for the turtle system
+   - Gmail app password (not your regular password)
+   - Personal email for receiving alerts
+
+2. **Home Assistant Token**:
+   - Long-lived access token (generated in Home Assistant)
+
+3. **Camera Credentials** (if your camera requires authentication):
+   - Camera admin username
+   - Camera admin password
+
+4. **System Passwords**:
+   - Turtle user password
+   - InfluxDB password (for data logging)
+   - Grafana password (for monitoring dashboards)
+
+### Step 1: Configure Secrets File
+
+Edit the secrets file with your actual credentials:
+
+```bash
+# Clone the repository first
+git clone https://github.com/yourusername/turtle-enclosure-system.git
+cd turtle-enclosure-system
+
+# Edit the secrets file
+nano home-assistant/secrets.yaml
+```
+
+**Update these values in `home-assistant/secrets.yaml`:**
+
+```yaml
+# Turtle Enclosure System Secrets
+# ⚠️  WARNING: DO NOT commit this file with real passwords to version control!
+
+# Email configuration for notifications
+email_username: "your-turtle-email@gmail.com"  # CHANGE THIS
+email_password: "your-app-password"  # CHANGE THIS - Use Gmail app password
+email_sender: "your-turtle-email@gmail.com"  # CHANGE THIS
+email_recipient: "your-personal-email@gmail.com"  # CHANGE THIS
+
+# Home Assistant long-lived access token
+homeassistant_token: "your-long-lived-access-token"  # CHANGE THIS
+
+# Camera credentials (if your camera requires authentication)
+camera_username: "admin"  # CHANGE IF NEEDED
+camera_password: "your-camera-password"  # CHANGE THIS
+
+# Zigbee channel (11 is recommended to avoid interference)
+zigbee_channel: 11  # CHANGE IF NEEDED
+```
+
+**How to get these values:**
+
+1. **Gmail App Password**:
+   - Go to your Google Account settings
+   - Enable 2-factor authentication
+   - Generate an "App Password" for "Mail"
+   - Use this app password, not your regular Gmail password
+
+2. **Home Assistant Token**:
+   - Will be generated after Home Assistant is running
+   - Go to Home Assistant → Profile → Long-Lived Access Tokens
+   - Create a new token with a descriptive name
+
+3. **Camera Credentials**:
+   - Check your camera's manual for default credentials
+   - Common defaults: admin/admin, admin/password, admin/12345
+
+### Step 2: Configure Docker Passwords
+
+Edit the Docker Compose file to set secure passwords:
+
+```bash
+nano docker/docker-compose.yml
+```
+
+**Update these values:**
+
+```yaml
+environment:
+  - DOCKER_INFLUXDB_INIT_PASSWORD=your_influxdb_password  # CHANGE THIS
+  # ... other settings ...
+  - GF_SECURITY_ADMIN_PASSWORD=your_grafana_password  # CHANGE THIS
+```
+
+**Recommended passwords:**
+- Use strong, unique passwords (12+ characters)
+- Include uppercase, lowercase, numbers, and symbols
+- Store these passwords securely (password manager recommended)
+
+### Step 3: Configure System User Password
+
+Edit the deployment script to set the turtle user password:
+
+```bash
+nano scripts/deploy.sh
+```
+
+**Find and update this line:**
+
+```bash
+echo "turtle:your_turtle_password" | sudo chpasswd  # CHANGE THIS
+```
+
+**Recommended password:**
+- Use a strong password for the turtle user
+- This user runs the kiosk interface
+
 ## 🚀 Deployment Steps
 
-### Step 1: Clone the Repository
+### Step 4: Clone and Deploy
 
 ```bash
 # Clone the repository to your home directory
@@ -48,7 +166,7 @@ You should see the following directories:
 - `docker/` - Docker configurations
 - `docs/` - Documentation and setup guides
 
-### Step 2: Run the Main Deployment Script
+### Step 5: Run the Main Deployment Script
 
 ```bash
 # Make the deployment script executable
@@ -61,15 +179,15 @@ sudo ./scripts/deploy.sh
 This script will:
 - Update system packages
 - Install required software (Chromium, X11, Python packages)
-- Create the `turtle` user for kiosk mode
+- Create the `turtle` user with your configured password
 - Configure display and touchscreen settings
 - Set up udev rules for USB devices
 - Install Home Assistant configuration
-- Create Docker Compose setup
+- Create Docker Compose setup with your configured passwords
 - Enable auto-start services
 - Set up monitoring and backup scripts
 
-### Step 3: Configure Hardware
+### Step 6: Configure Hardware
 
 ```bash
 # Run the hardware setup script
@@ -83,25 +201,37 @@ This script will:
 - Check touchscreen configuration
 - Create device test scripts
 
-### Step 4: Update Configuration Secrets
+### Step 7: Generate Home Assistant Token
 
-Edit the secrets file with your actual credentials:
+After Home Assistant starts for the first time:
 
-```bash
-sudo nano /opt/homeassistant/config/secrets.yaml
-```
+1. **Access Home Assistant**:
+   - Via touchscreen kiosk, or
+   - Via web browser: `http://your-server-ip:8123`
 
-Update the following values:
-- `email_username`: Your Gmail address
-- `email_password`: Your Gmail app password
-- `email_sender`: Your Gmail address
-- `email_recipient`: Where to send alerts
-- `homeassistant_token`: Long-lived access token (generate in HA)
-- `camera_username`: Camera admin username
-- `camera_password`: Camera admin password
-- `zigbee_channel`: Zigbee channel (11 recommended)
+2. **Complete Initial Setup**:
+   - Create admin account
+   - Set up your location
+   - Complete onboarding
 
-### Step 5: Reboot the System
+3. **Generate Long-Lived Access Token**:
+   - Go to **Profile** → **Long-Lived Access Tokens**
+   - Click **Create Token**
+   - Name it "Turtle Enclosure System"
+   - Copy the generated token
+
+4. **Update Secrets File**:
+   ```bash
+   sudo nano /opt/homeassistant/config/secrets.yaml
+   ```
+   - Replace `your-long-lived-access-token` with the actual token
+
+5. **Restart Home Assistant**:
+   ```bash
+   cd /opt/homeassistant && docker-compose restart
+   ```
+
+### Step 8: Reboot the System
 
 ```bash
 # Reboot to apply all changes
@@ -116,13 +246,13 @@ After reboot, the system will:
 
 ## 🔧 Post-Deployment Configuration
 
-### Step 6: Access Home Assistant
+### Step 9: Access Home Assistant
 
 1. **Via Touchscreen**: The kiosk should automatically display Home Assistant
 2. **Via Web Browser**: Navigate to `http://your-server-ip:8123`
 3. **Initial Setup**: Complete the Home Assistant onboarding process
 
-### Step 7: Configure Devices
+### Step 10: Configure Devices
 
 #### TEMPerHUM Sensor
 The sensor should be automatically detected. Verify in:
@@ -146,27 +276,24 @@ Configure the camera in:
    - They should appear in the Zigbee integration
    - Rename them appropriately (e.g., "Cooling Fan", "Misting System")
 
-### Step 8: Touchscreen Calibration
+### Step 11: Touchscreen Calibration
 
 **One-Time Automatic Calibration**: The system will automatically calibrate the touchscreen on the first boot after deployment. Calibration values are saved permanently and reused on subsequent boots.
 
 **What happens:**
 1. **First boot** - Automatic calibration runs in background
-2. **Calibration values saved** - Stored permanently in `/opt/turtle-enclosure/saved_calibration.conf`
+2. **Calibration values saved** - Stored permanently in `/etc/X11/xorg.conf.d/99-touchscreen-calibration.conf`
 3. **Future boots** - Saved values applied automatically, no recalibration needed
 
 **Manual Calibration** (if needed):
 ```bash
-# Reset saved calibration values
-turtle-reset-calibration
-
 # Run manual calibration
 turtle-calibrate
 ```
 
 **Note**: Once calibrated, the touchscreen will work perfectly on all future boots without needing recalibration.
 
-### Step 9: Configure Dashboard
+### Step 12: Configure Dashboard
 
 1. **Access Lovelace**:
    - **Configuration** → **Dashboards** → **Turtle Enclosure**
@@ -314,8 +441,7 @@ xinput list
 xinput test-xi2 --root
 
 # Recalibrate touchscreen
-sudo apt install xinput-calibrator
-xinput_calibrator
+turtle-calibrate
 ```
 
 #### Touchscreen Calibration Issues
