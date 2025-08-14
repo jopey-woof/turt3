@@ -105,21 +105,50 @@ setup_touchscreen() {
         print_status "Manual calibration may be required after deployment"
     fi
     
+    # Handle conflicting calibration files - CRITICAL FIX
+    print_status "Checking for conflicting calibration files..."
+    
+    # Fix 99-calibration.conf if it exists and has wrong matrix
+    if [ -f /etc/X11/xorg.conf.d/99-calibration.conf ]; then
+        print_status "Found 99-calibration.conf - checking for conflicts..."
+        if grep -q 'CalibrationMatrix "1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0"' /etc/X11/xorg.conf.d/99-calibration.conf; then
+            print_status "Fixing conflicting calibration matrix in 99-calibration.conf..."
+            sudo sed -i 's|Option "CalibrationMatrix" "1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0"|Option "CalibrationMatrix" "1.0 0.0 0.0 0.0 0.8 0.0 0.0 0.0 1.0"|' /etc/X11/xorg.conf.d/99-calibration.conf
+            print_success "Fixed conflicting calibration matrix in 99-calibration.conf"
+        else
+            print_success "99-calibration.conf already has correct matrix"
+        fi
+    fi
+    
+    # Remove other conflicting calibration files
+    if [ -f /etc/X11/xorg.conf.d/99-touchscreen-calibration.conf ]; then
+        sudo rm /etc/X11/xorg.conf.d/99-touchscreen-calibration.conf
+        print_success "Removed old touchscreen calibration file"
+    fi
+    
+    # Verify all calibration files are consistent
+    print_status "Verifying calibration consistency..."
+    CALIBRATION_FILES=$(find /etc/X11/xorg.conf.d/ -name "*.conf" -exec grep -l "CalibrationMatrix" {} \; 2>/dev/null || true)
+    
+    if [ -n "$CALIBRATION_FILES" ]; then
+        for file in $CALIBRATION_FILES; do
+            if grep -q 'CalibrationMatrix "1.0 0.0 0.0 0.0 0.8 0.0 0.0 0.0 1.0"' "$file"; then
+                print_success "✅ $file has correct calibration matrix"
+            else
+                print_warning "⚠️  $file has incorrect calibration matrix - fixing..."
+                sudo sed -i 's|Option "CalibrationMatrix" "[^"]*"|Option "CalibrationMatrix" "1.0 0.0 0.0 0.0 0.8 0.0 0.0 0.0 1.0"|' "$file"
+                print_success "Fixed calibration matrix in $file"
+            fi
+        done
+    fi
+    
     # Save calibration for future use
     sudo mkdir -p /opt/turtle-enclosure
     sudo cp /etc/X11/xorg.conf.d/10-touchscreen.conf /opt/turtle-enclosure/saved_calibration.conf
     sudo chmod 644 /opt/turtle-enclosure/saved_calibration.conf
     
-    # Remove any conflicting calibration files
-    if [ -f /etc/X11/xorg.conf.d/99-calibration.conf ]; then
-        sudo rm /etc/X11/xorg.conf.d/99-calibration.conf
-        print_success "Removed conflicting calibration file"
-    fi
-    
-    if [ -f /etc/X11/xorg.conf.d/99-touchscreen-calibration.conf ]; then
-        sudo rm /etc/X11/xorg.conf.d/99-touchscreen-calibration.conf
-        print_success "Removed old touchscreen calibration file"
-    fi
+    print_success "Touchscreen calibration setup completed successfully!"
+    print_status "All calibration files now have the correct matrix for vertical scaling fix"
 }
 
 # Check if running as root
