@@ -297,7 +297,7 @@ sudo -A chmod -R o+rX /home/shrimp/turt3
 
 # Install Home Assistant Plugins (Mushroom Cards, Kiosk Mode)
 print_status "Installing Home Assistant plugins (Mushroom Cards, Kiosk Mode)..."
-SUDO_PASSWORD_OVERRIDE="turtle123" sudo -A -u turtle bash ./scripts/install-plugins.sh
+sudo -A -u turtle bash ./scripts/install-plugins.sh
 
 # Copy Home Assistant configurations
 sudo -A cp -r home-assistant/* /opt/homeassistant/config/
