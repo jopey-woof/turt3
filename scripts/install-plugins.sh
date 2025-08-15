@@ -57,36 +57,23 @@ print_status "Installing Mushroom Cards and Kiosk Mode plugins..."
 print_status "Creating directories..."
 mkdir -p "$HA_CONFIG_DIR/custom_components"
 mkdir -p "$HA_CONFIG_DIR/www/kiosk-mode"
+mkdir -p "$HA_CONFIG_DIR/www/mushroom" # Ensure mushroom www directory exists
 mkdir -p "$HA_CONFIG_DIR/packages"
 
 # Install Mushroom Cards
 print_status "Installing Mushroom Cards..."
-cd "$HA_CONFIG_DIR/custom_components"
 
-if [[ -d "mushroom" ]]; then
-    print_warning "Mushroom directory already exists. Updating..."
-    cd mushroom
-    git pull origin main
-    cd ..
-else
-    print_status "Cloning Mushroom repository..."
-    git clone https://github.com/piitaya/lovelace-mushroom.git mushroom
+# Download mushroom.js from latest release
+cd "$HA_CONFIG_DIR/www/mushroom"
+if [[ -f "mushroom.js" ]]; then
+    print_warning "Mushroom Cards plugin already exists. Updating..."
+    rm mushroom.js
 fi
-
-# Find the actual mushroom.js file and move it to the expected location
-if [[ ! -f "mushroom/mushroom.js" ]]; then
-    MUSHROOM_JS_PATH=$(find mushroom -name "mushroom.js" -print -quit)
-    if [[ -n "$MUSHROOM_JS_PATH" ]]; then
-        print_status "Found mushroom.js at $MUSHROOM_JS_PATH, moving to mushroom/mushroom.js"
-        mv "$MUSHROOM_JS_PATH" mushroom/
-    else
-        print_error "Could not find mushroom.js in the cloned repository."
-        exit 1
-    fi
-fi
+print_status "Downloading Mushroom Cards plugin..."
+wget -q https://github.com/piitaya/lovelace-mushroom/releases/latest/download/mushroom.js
 
 # Verify Mushroom installation
-if [[ -f "mushroom/mushroom.js" ]]; then
+if [[ -f "mushroom.js" ]]; then
     print_success "Mushroom Cards installed successfully"
 else
     print_error "Failed to install Mushroom Cards"
