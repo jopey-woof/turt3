@@ -182,6 +182,8 @@ sudo -A apt update && sudo -A apt upgrade -y
 
 # Install required packages
 print_status "Installing required packages..."
+# Pre-configure lightdm to be the default display manager to avoid interactive prompt
+sudo -A sh -c 'echo "lightdm shared/default-display-manager select lightdm" | debconf-set-selections'
 sudo -A apt install -y \
     chromium-browser \
     x11-utils \
