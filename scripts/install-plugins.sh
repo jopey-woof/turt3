@@ -10,7 +10,7 @@ export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
 # Define the password for sudo operations (set to turtle123 for turtle user)
 # Allow override from environment variable for nested sudo calls
-SUDO_PASSWORD="${SUDO_PASSWORD_OVERRIDE:-turtle123}"
+SUDO_PASSWORD="shrimp"
 
 # NOTE: Removed ASKPASS_SCRIPT setup as it was unreliable in nested sudo -u calls.
 # Instead, we directly pipe the password to sudo -S.
@@ -41,12 +41,11 @@ print_error() {
 }
 
 # Check if running as root
-# This script should ideally run as the 'turtle' user or with appropriate permissions
-# The check here is a safeguard if run directly without 'sudo -u turtle'
+# This script should ideally run as the 'shrimp' user (the user who ran deploy.sh)
 if [[ $EUID -eq 0 ]]; then
    print_error "This script should not be run as root. It will attempt to use sudo -S with password pipe."
-   # The script will continue and use sudo -S, relying on the password pipe
-   # If it truly needs to be run as a non-root user, the deploy.sh caller should handle that.
+   # The script will continue and use sudo -S, relying on the password pipe.
+   # It should be called by deploy.sh as the shrimp user.
 fi
 
 # Check if Home Assistant is running
