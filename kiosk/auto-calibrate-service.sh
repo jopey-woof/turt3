@@ -9,16 +9,6 @@ set -e
 echo "🐢 Auto-Calibration Service"
 echo "=========================="
 
-# Wait for kiosk to be fully ready
-echo "⏳ Waiting for kiosk to be ready..."
-sleep 30
-
-# Check if kiosk is running
-if ! systemctl is-active --quiet kiosk; then
-    echo "❌ Kiosk service not running. Skipping calibration."
-    exit 0
-fi
-
 # Set up display environment
 export DISPLAY=:0
 export XAUTHORITY=/home/turtle/.Xauthority

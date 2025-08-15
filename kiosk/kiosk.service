@@ -1,7 +1,7 @@
 [Unit]
 Description=Turtle Enclosure Kiosk Display
-After=network.target graphical-session.target docker.service
-Wants=network.target
+After=network.target graphical-session.target docker.service auto-calibrate.service
+Wants=network.target auto-calibrate.service
 Requires=docker.service
 
 [Service]
@@ -19,4 +19,4 @@ Restart=always
 RestartSec=10
 
 [Install]
-WantedBy=multi-user.target 
+WantedBy=graphical.target 
