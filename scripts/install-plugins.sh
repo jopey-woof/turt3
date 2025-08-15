@@ -53,7 +53,7 @@ fi
 
 # Check if Home Assistant is running
 print_status "Checking Home Assistant status..."
-if ! docker ps | grep -q homeassistant; then
+if ! docker compose ps | grep -q homeassistant; then
     print_error "Home Assistant container is not running. Please start it first."
     exit 1
 fi
@@ -188,14 +188,14 @@ sudo -A chmod -R 755 "$HA_CONFIG_DIR"
 print_status "Restarting Home Assistant..."
 cd /opt/homeassistant
 # No sudo needed here as docker-compose should be managed by the user
-docker-compose restart homeassistant
+docker compose restart homeassistant
 
 # Wait for Home Assistant to start
 print_status "Waiting for Home Assistant to start..."
 sleep 30
 
 # Check if Home Assistant is running
-if docker ps | grep -q homeassistant; then
+if docker compose ps | grep -q homeassistant; then
     print_success "Home Assistant restarted successfully"
 else
     print_error "Failed to restart Home Assistant"

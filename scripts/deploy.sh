@@ -456,7 +456,7 @@ cat > /tmp/startup.sh << 'EOF'
 # Turtle Enclosure Startup Script
 
 cd /opt/homeassistant
-docker-compose up -d
+docker compose up -d
 
 # Wait for Home Assistant to start
 sleep 30
