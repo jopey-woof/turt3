@@ -5,6 +5,9 @@
 
 set -e  # Exit on any error
 
+# Explicitly set PATH for non-interactive sudo -u user execution
+export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
 # Define the password for sudo operations (set to turtle123 for turtle user)
 SUDO_PASSWORD="turtle123"
 
