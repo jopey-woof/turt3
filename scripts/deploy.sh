@@ -223,6 +223,11 @@ print_status "Creating systemd override directory..."
 sudo -S mkdir -p /etc/systemd/system/getty@tty1.service.d/
 sudo -S cp kiosk/autologin.conf /etc/systemd/system/getty@tty1.service.d/
 
+# Restart LightDM to ensure a clean display environment for configuration
+print_warning "Restarting LightDM. This will disconnect your SSH session. Please reconnect and re-run the deploy script after this step."
+sudo -S systemctl restart lightdm || true # Allow failure if LightDM isn't running
+sleep 5 # Give LightDM a moment to restart
+
 # Make the display configuration script executable and then run it
 sudo -S chmod +x kiosk/display-config.sh
 sudo -S bash kiosk/display-config.sh
