@@ -279,18 +279,17 @@ sudo -A cp hardware/udev-rules.conf /etc/udev/rules.d/99-turtle-hardware.rules
 sudo -A udevadm control --reload-rules
 sudo -A udevadm trigger
 
-# Create Home Assistant configuration directory
+# Create Home Assistant configuration directory and set permissions for turtle user
 print_status "Setting up Home Assistant configuration..."
 sudo -A mkdir -p /opt/homeassistant/config
 sudo -A chown -R turtle:turtle /opt/homeassistant
 
 # Install Home Assistant Plugins (Mushroom Cards, Kiosk Mode)
 print_status "Installing Home Assistant plugins (Mushroom Cards, Kiosk Mode)..."
-sudo -A -u turtle bash ./scripts/install-plugins.sh
+bash ./scripts/install-plugins.sh
 
 # Copy Home Assistant configurations
 sudo -A cp -r home-assistant/* /opt/homeassistant/config/
-sudo -A chown -R turtle:turtle /opt/homeassistant/config
 
 # Create secrets file template
 if [ ! -f /opt/homeassistant/config/secrets.yaml ]; then
