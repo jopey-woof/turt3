@@ -291,6 +291,10 @@ print_status "Setting up Home Assistant configuration..."
 sudo -A mkdir -p /opt/homeassistant/config
 sudo -A chown -R turtle:turtle /opt/homeassistant
 
+# Ensure install-plugins.sh is executable and turt3 directory is readable by turtle user
+sudo -A chmod +x scripts/install-plugins.sh
+sudo -A chmod -R o+rX /home/shrimp/turt3
+
 # Install Home Assistant Plugins (Mushroom Cards, Kiosk Mode)
 print_status "Installing Home Assistant plugins (Mushroom Cards, Kiosk Mode)..."
 sudo -A -u turtle bash ./scripts/install-plugins.sh
@@ -504,9 +508,9 @@ log() {
 }
 
 # Check Home Assistant container
-if ! docker ps | grep -q homeassistant; then
+if ! docker compose ps | grep -q homeassistant; then
     log "ERROR: Home Assistant container not running"
-    cd /opt/homeassistant && docker-compose up -d
+    cd /opt/homeassistant && docker compose up -d
 fi
 
 # Check kiosk service
