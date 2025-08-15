@@ -31,6 +31,18 @@ fi
 
 echo "✅ Display ready for calibration"
 
+# --- BEGIN Display Configuration from display-config.sh and calibrate-10inch.sh ---
+# Set display resolution
+xrandr --output HDMI-1 --mode 1024x600 || echo "Warning: Could not set HDMI-1 to 1024x600. Display might be different."
+
+# Apply the correct calibration matrix for 10.1" screen (1024x600)
+xinput set-prop 'yldzkj USB2IIC_CTP_CONTROL' 'Coordinate Transformation Matrix' 1.0 0.0 0.0 0.0 0.8 0.0 0.0 0.0 1.0
+
+# Hide the cursor for kiosk mode
+/usr/local/bin/turtle-hide-cursor
+echo "✅ Initial display and kiosk settings applied"
+# --- END Display Configuration ---
+
 # Check if calibration values are already saved
 CALIBRATION_FILE="/opt/turtle-enclosure/saved_calibration.conf"
 if [ -f "$CALIBRATION_FILE" ]; then
