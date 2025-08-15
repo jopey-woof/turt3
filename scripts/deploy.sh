@@ -71,29 +71,29 @@ setup_touchscreen() {
     # Install calibration tools
     if ! command -v xinput_calibrator &> /dev/null; then
         print_status "Installing touchscreen calibration tools..."
-        sudo apt update
-        sudo apt install -y xinput-calibrator
+        sudo -S apt update
+        sudo -S apt install -y xinput-calibrator
     fi
     
     # Install touchscreen configuration
     print_status "Installing touchscreen configuration..."
-    sudo cp kiosk/10-touchscreen.conf /etc/X11/xorg.conf.d/
-    sudo chmod 644 /etc/X11/xorg.conf.d/10-touchscreen.conf
+    sudo -S cp kiosk/10-touchscreen.conf /etc/X11/xorg.conf.d/
+    sudo -S chmod 644 /etc/X11/xorg.conf.d/10-touchscreen.conf
     
     # Apply known good calibration for 10.1" screens to fix vertical scaling issues
     print_status "Applying known good 10.1\" touchscreen calibration..."
-    sudo mkdir -p /etc/X11/xorg.conf.d/
+    sudo -S mkdir -p /etc/X11/xorg.conf.d/
     
     # Backup current configuration
     if [ -f /etc/X11/xorg.conf.d/10-touchscreen.conf ]; then
-        sudo cp /etc/X11/xorg.conf.d/10-touchscreen.conf /etc/X11/xorg.conf.d/10-touchscreen.conf.backup.$(date +%Y%m%d_%H%M%S)
+        sudo -S cp /etc/X11/xorg.conf.d/10-touchscreen.conf /etc/X11/xorg.conf.d/10-touchscreen.conf.backup.$(date +%Y%m%d_%H%M%S)
     fi
     
     # Apply the known good calibration matrix that fixes vertical scaling issues
     # This matrix (1.0 0.0 0.0 0.0 0.8 0.0 0.0 0.0 1.0) fixes the issue where
     # vertical scaling gets worse as you move down the screen
     print_status "Applying calibration matrix to fix vertical scaling issues..."
-    sudo sed -i 's|Option "CalibrationMatrix" ""|Option "CalibrationMatrix" "1.0 0.0 0.0 0.0 0.8 0.0 0.0 0.0 1.0"|' /etc/X11/xorg.conf.d/10-touchscreen.conf
+    sudo -S sed -i 's|Option "CalibrationMatrix" ""|Option "CalibrationMatrix" "1.0 0.0 0.0 0.0 0.8 0.0 0.0 0.0 1.0"|' /etc/X11/xorg.conf.d/10-touchscreen.conf
     
     # Verify the change was applied
     if grep -q 'CalibrationMatrix "1.0 0.0 0.0 0.0 0.8 0.0 0.0 0.0 1.0"' /etc/X11/xorg.conf.d/10-touchscreen.conf; then
@@ -113,7 +113,7 @@ setup_touchscreen() {
         print_status "Found 99-calibration.conf - checking for conflicts..."
         if grep -q 'CalibrationMatrix "1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0"' /etc/X11/xorg.conf.d/99-calibration.conf; then
             print_status "Fixing conflicting calibration matrix in 99-calibration.conf..."
-            sudo sed -i 's|Option "CalibrationMatrix" "1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0"|Option "CalibrationMatrix" "1.0 0.0 0.0 0.0 0.8 0.0 0.0 0.0 1.0"|' /etc/X11/xorg.conf.d/99-calibration.conf
+            sudo -S sed -i 's|Option "CalibrationMatrix" "1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0"|Option "CalibrationMatrix" "1.0 0.0 0.0 0.0 0.8 0.0 0.0 0.0 1.0"|' /etc/X11/xorg.conf.d/99-calibration.conf
             print_success "Fixed conflicting calibration matrix in 99-calibration.conf"
         else
             print_success "99-calibration.conf already has correct matrix"
@@ -122,7 +122,7 @@ setup_touchscreen() {
     
     # Remove other conflicting calibration files
     if [ -f /etc/X11/xorg.conf.d/99-touchscreen-calibration.conf ]; then
-        sudo rm /etc/X11/xorg.conf.d/99-touchscreen-calibration.conf
+        sudo -S rm /etc/X11/xorg.conf.d/99-touchscreen-calibration.conf
         print_success "Removed old touchscreen calibration file"
     fi
     
@@ -136,16 +136,16 @@ setup_touchscreen() {
                 print_success "✅ $file has correct calibration matrix"
             else
                 print_warning "⚠️  $file has incorrect calibration matrix - fixing..."
-                sudo sed -i 's|Option "CalibrationMatrix" "[^"]*"|Option "CalibrationMatrix" "1.0 0.0 0.0 0.0 0.8 0.0 0.0 0.0 1.0"|' "$file"
+                sudo -S sed -i 's|Option "CalibrationMatrix" "[^"]*"|Option "CalibrationMatrix" "1.0 0.0 0.0 0.0 0.8 0.0 0.0 0.0 1.0"|' "$file"
                 print_success "Fixed calibration matrix in $file"
             fi
         done
     fi
     
     # Save calibration for future use
-    sudo mkdir -p /opt/turtle-enclosure
-    sudo cp /etc/X11/xorg.conf.d/10-touchscreen.conf /opt/turtle-enclosure/saved_calibration.conf
-    sudo chmod 644 /opt/turtle-enclosure/saved_calibration.conf
+    sudo -S mkdir -p /opt/turtle-enclosure
+    sudo -S cp /etc/X11/xorg.conf.d/10-touchscreen.conf /opt/turtle-enclosure/saved_calibration.conf
+    sudo -S chmod 644 /opt/turtle-enclosure/saved_calibration.conf
     
     print_success "Touchscreen calibration setup completed successfully!"
     print_status "All calibration files now have the correct matrix for vertical scaling fix"
@@ -166,11 +166,11 @@ print_status "Starting deployment process..."
 
 # Update system packages
 print_status "Updating system packages..."
-sudo apt update && sudo apt upgrade -y
+sudo -S apt update && sudo -S apt upgrade -y
 
 # Install required packages
 print_status "Installing required packages..."
-sudo apt install -y \
+sudo -S apt install -y \
     chromium-browser \
     x11-utils \
     xinput \
@@ -200,9 +200,9 @@ pip3 install --user \
 # Create turtle user if it doesn't exist
 if ! id "turtle" &>/dev/null; then
     print_status "Creating turtle user..."
-    sudo useradd -m -s /bin/bash turtle
-    sudo usermod -aG video,audio,plugdev,docker turtle
-    echo "turtle:your_turtle_password" | sudo chpasswd
+    sudo -S useradd -m -s /bin/bash turtle
+    sudo -S usermod -aG video,audio,plugdev,docker turtle
+    echo "turtle:your_turtle_password" | sudo -S chpasswd
     print_success "Turtle user created"
 else
     print_status "Turtle user already exists"
@@ -210,74 +210,74 @@ fi
 
 # Configure display and kiosk
 print_status "Configuring display and kiosk..."
-sudo cp kiosk/kiosk.service /etc/systemd/system/
+sudo -S cp kiosk/kiosk.service /etc/systemd/system/
 
 # Copy Home Assistant configuration
 print_status "Configuring Home Assistant connection..."
-sudo mkdir -p /etc/turtle-enclosure
-sudo cp kiosk/ha-config.conf /etc/turtle-enclosure/
-sudo chmod 644 /etc/turtle-enclosure/ha-config.conf
+sudo -S mkdir -p /etc/turtle-enclosure
+sudo -S cp kiosk/ha-config.conf /etc/turtle-enclosure/
+sudo -S chmod 644 /etc/turtle-enclosure/ha-config.conf
 
 # Create systemd override directory for getty service
 print_status "Creating systemd override directory..."
-sudo mkdir -p /etc/systemd/system/getty@tty1.service.d/
-sudo cp kiosk/autologin.conf /etc/systemd/system/getty@tty1.service.d/
+sudo -S mkdir -p /etc/systemd/system/getty@tty1.service.d/
+sudo -S cp kiosk/autologin.conf /etc/systemd/system/getty@tty1.service.d/
 
 # Make the display configuration script executable and then run it
-sudo chmod +x kiosk/display-config.sh
-sudo bash kiosk/display-config.sh
+sudo -S chmod +x kiosk/display-config.sh
+sudo -S bash kiosk/display-config.sh
 
 # Setup touchscreen calibration and merge configurations
 setup_touchscreen
 
 # Install working calibration script for 10.1" screens
 print_status "Installing 10.1\" touchscreen calibration script..."
-sudo cp kiosk/calibrate-10inch.sh /usr/local/bin/turtle-calibrate
-sudo chmod +x /usr/local/bin/turtle-calibrate
+sudo -S cp kiosk/calibrate-10inch.sh /usr/local/bin/turtle-calibrate
+sudo -S chmod +x /usr/local/bin/turtle-calibrate
 print_success "10.1\" calibration script installed as: turtle-calibrate"
 
 # Install auto-calibration service
 print_status "Installing auto-calibration service..."
-sudo mkdir -p /opt/turtle-enclosure
-sudo cp kiosk/auto-calibrate-service.sh /opt/turtle-enclosure/
-sudo chmod +x /opt/turtle-enclosure/auto-calibrate-service.sh
-sudo cp kiosk/auto-calibrate.service /etc/systemd/system/
-sudo systemctl daemon-reload
-sudo systemctl enable auto-calibrate.service
+sudo -S mkdir -p /opt/turtle-enclosure
+sudo -S cp kiosk/auto-calibrate-service.sh /opt/turtle-enclosure/
+sudo -S chmod +x /opt/turtle-enclosure/auto-calibrate-service.sh
+sudo -S cp kiosk/auto-calibrate.service /etc/systemd/system/
+sudo -S systemctl daemon-reload
+sudo -S systemctl enable auto-calibrate.service
 print_success "Auto-calibration service installed and enabled"
 
 # Install known calibrations
 print_status "Installing known calibration values..."
-sudo cp kiosk/known-calibrations.conf /opt/turtle-enclosure/
-sudo chmod 644 /opt/turtle-enclosure/known-calibrations.conf
-sudo cp kiosk/apply-known-calibration.sh /usr/local/bin/turtle-apply-known
-sudo chmod +x /usr/local/bin/turtle-apply-known
+sudo -S cp kiosk/known-calibrations.conf /opt/turtle-enclosure/
+sudo -S chmod 644 /opt/turtle-enclosure/known-calibrations.conf
+sudo -S cp kiosk/apply-known-calibration.sh /usr/local/bin/turtle-apply-known
+sudo -S chmod +x /usr/local/bin/turtle-apply-known
 print_success "Known calibrations installed as: turtle-apply-known"
 
 # Install cursor hiding script
 print_status "Installing cursor hiding script..."
-sudo cp kiosk/hide-cursor.sh /usr/local/bin/turtle-hide-cursor
-sudo chmod +x /usr/local/bin/turtle-hide-cursor
+sudo -S cp kiosk/hide-cursor.sh /usr/local/bin/turtle-hide-cursor
+sudo -S chmod +x /usr/local/bin/turtle-hide-cursor
 print_success "Cursor hiding script installed as: turtle-hide-cursor"
 
 # Configure hardware
 print_status "Configuring hardware..."
-sudo cp hardware/udev-rules.conf /etc/udev/rules.d/99-turtle-hardware.rules
-sudo udevadm control --reload-rules
-sudo udevadm trigger
+sudo -S cp hardware/udev-rules.conf /etc/udev/rules.d/99-turtle-hardware.rules
+sudo -S udevadm control --reload-rules
+sudo -S udevadm trigger
 
 # Create Home Assistant configuration directory
 print_status "Setting up Home Assistant configuration..."
-sudo mkdir -p /opt/homeassistant/config
-sudo chown -R turtle:turtle /opt/homeassistant
+sudo -S mkdir -p /opt/homeassistant/config
+sudo -S chown -R turtle:turtle /opt/homeassistant
 
 # Install Home Assistant Plugins (Mushroom Cards, Kiosk Mode)
 print_status "Installing Home Assistant plugins (Mushroom Cards, Kiosk Mode)..."
-sudo bash ./scripts/install-plugins-fixed.sh
+sudo -S bash ./scripts/install-plugins-fixed.sh
 
 # Copy Home Assistant configurations
-sudo cp -r home-assistant/* /opt/homeassistant/config/
-sudo chown -R turtle:turtle /opt/homeassistant/config
+sudo -S cp -r home-assistant/* /opt/homeassistant/config/
+sudo -S chown -R turtle:turtle /opt/homeassistant/config
 
 # Create secrets file template
 if [ ! -f /opt/homeassistant/config/secrets.yaml ]; then
@@ -303,8 +303,8 @@ camera_password: "your-camera-password"
 # Zigbee configuration
 zigbee_channel: "11"
 EOF
-    sudo mv /tmp/secrets.yaml /opt/homeassistant/config/
-    sudo chown turtle:turtle /opt/homeassistant/config/secrets.yaml
+    sudo -S mv /tmp/secrets.yaml /opt/homeassistant/config/
+    sudo -S chown turtle:turtle /opt/homeassistant/config/secrets.yaml
     print_warning "Please update /opt/homeassistant/config/secrets.yaml with your actual credentials"
 fi
 
@@ -382,9 +382,9 @@ if __name__ == "__main__":
     main()
 EOF
 
-sudo mv /tmp/temperhum_reader.py /opt/homeassistant/config/
-sudo chown turtle:turtle /opt/homeassistant/config/temperhum_reader.py
-sudo chmod +x /opt/homeassistant/config/temperhum_reader.py
+sudo -S mv /tmp/temperhum_reader.py /opt/homeassistant/config/
+sudo -S chown turtle:turtle /opt/homeassistant/config/temperhum_reader.py
+sudo -S chmod +x /opt/homeassistant/config/temperhum_reader.py
 
 # Create Docker Compose file for Home Assistant
 print_status "Creating Docker Compose configuration..."
@@ -422,14 +422,14 @@ services:
       - WATCHTOWER_SCHEDULE=0 0 2 * * *
 EOF
 
-sudo mv /tmp/docker-compose.yml /opt/homeassistant/
-sudo chown turtle:turtle /opt/homeassistant/docker-compose.yml
+sudo -S mv /tmp/docker-compose.yml /opt/homeassistant/
+sudo -S chown turtle:turtle /opt/homeassistant/docker-compose.yml
 
 # Enable and start services
 print_status "Enabling and starting services..."
-sudo systemctl daemon-reload
-sudo systemctl enable kiosk
-sudo systemctl enable getty@tty1
+sudo -S systemctl daemon-reload
+sudo -S systemctl enable kiosk
+sudo -S systemctl enable getty@tty1
 
 # Create startup script
 print_status "Creating startup script..."
@@ -447,9 +447,9 @@ sleep 30
 systemctl start kiosk
 EOF
 
-sudo mv /tmp/startup.sh /opt/homeassistant/
-sudo chown turtle:turtle /opt/homeassistant/startup.sh
-sudo chmod +x /opt/homeassistant/startup.sh
+sudo -S mv /tmp/startup.sh /opt/homeassistant/
+sudo -S chown turtle:turtle /opt/homeassistant/startup.sh
+sudo -S chmod +x /opt/homeassistant/startup.sh
 
 # Create systemd service for startup
 cat > /tmp/turtle-startup.service << 'EOF'
@@ -469,9 +469,9 @@ RemainAfterExit=yes
 WantedBy=multi-user.target
 EOF
 
-sudo mv /tmp/turtle-startup.service /etc/systemd/system/
-sudo systemctl daemon-reload
-sudo systemctl enable turtle-startup
+sudo -S mv /tmp/turtle-startup.service /etc/systemd/system/
+sudo -S systemctl daemon-reload
+sudo -S systemctl enable turtle-startup
 
 # Create monitoring script
 print_status "Creating system monitoring script..."
@@ -510,12 +510,12 @@ if [ "$MEM_USAGE" -gt 90 ]; then
 fi
 EOF
 
-sudo mv /tmp/monitor.sh /opt/homeassistant/
-sudo chown turtle:turtle /opt/homeassistant/monitor.sh
-sudo chmod +x /opt/homeassistant/monitor.sh
+sudo -S mv /tmp/monitor.sh /opt/homeassistant/
+sudo -S chown turtle:turtle /opt/homeassistant/monitor.sh
+sudo -S chmod +x /opt/homeassistant/monitor.sh
 
 # Create cron job for monitoring
-echo "*/5 * * * * /opt/homeassistant/monitor.sh" | sudo crontab -
+echo "*/5 * * * * /opt/homeassistant/monitor.sh" | sudo -S crontab -
 
 # Create backup script
 print_status "Creating backup script..."
@@ -544,12 +544,12 @@ find "$BACKUP_DIR" -name "*.tar.gz" -mtime +7 -delete
 echo "Backup completed: $DATE"
 EOF
 
-sudo mv /tmp/backup.sh /opt/homeassistant/
-sudo chown turtle:turtle /opt/homeassistant/backup.sh
-sudo chmod +x /opt/homeassistant/backup.sh
+sudo -S mv /tmp/backup.sh /opt/homeassistant/
+sudo -S chown turtle:turtle /opt/homeassistant/backup.sh
+sudo -S chmod +x /opt/homeassistant/backup.sh
 
 # Add daily backup to cron
-echo "0 2 * * * /opt/homeassistant/backup.sh" | sudo crontab -
+echo "0 2 * * * /opt/homeassistant/backup.sh" | sudo -S crontab -
 
 print_success "Deployment completed successfully!"
 
