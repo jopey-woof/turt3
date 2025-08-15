@@ -39,35 +39,44 @@ fi
 ONBOARDING_CONFIG='onboarding:
   skip: true'
 
-# Check if configuration.yaml exists
-if docker exec homeassistant test -f /config/configuration.yaml; then
+# Define the path to configuration.yaml on the host
+HA_CONFIG_PATH="/home/shrimp/homeassistant/config/configuration.yaml"
+
+# Check if configuration.yaml exists on the host
+if [ -f "$HA_CONFIG_PATH" ]; then
     print_status "Backing up existing configuration.yaml..."
-    docker exec homeassistant cp /config/configuration.yaml /config/configuration.yaml.backup
+    echo "shrimp" | sudo -S cp "$HA_CONFIG_PATH" "$HA_CONFIG_PATH.backup"
     
     # Check if onboarding is already configured
-    if docker exec homeassistant grep -q "onboarding:" /config/configuration.yaml; then
+    if grep -q "onboarding:" "$HA_CONFIG_PATH"; then
         print_status "Onboarding configuration already exists, updating..."
         # Remove existing onboarding section and any lines indented below it
-        docker exec homeassistant sed -i '/^onboarding:/,/^[^ ].*/d' /config/configuration.yaml
+        echo "shrimp" | sudo -S sed -i '/^onboarding:/,/^[^ ].*/d' "$HA_CONFIG_PATH"
     fi
     
     # Ensure a newline at the end of the file before appending, if it's not empty
-    if docker exec homeassistant test -s /config/configuration.yaml; then
-        docker exec homeassistant sh -c '[ -z "$(tail -c 1 /config/configuration.yaml)" ] || echo "" >> /config/configuration.yaml'
+    if [ -s "$HA_CONFIG_PATH" ]; then
+        if [ -z "$(tail -c 1 "$HA_CONFIG_PATH")" ]; then
+            # File already ends with a newline, do nothing
+            :
+        else
+            # File does not end with a newline, add one
+            echo "shrimp" | sudo -S sh -c 'echo "" >> "$HA_CONFIG_PATH"'
+        fi
     fi
     
     # Add onboarding configuration
     print_status "Adding onboarding skip configuration..."
-    docker exec homeassistant sh -c "echo '$ONBOARDING_CONFIG' >> /config/configuration.yaml"
+    echo "shrimp" | sudo -S sh -c "echo '$ONBOARDING_CONFIG' >> "$HA_CONFIG_PATH""
 else
     print_status "Creating new configuration.yaml..."
-    docker exec homeassistant sh -c "echo '$ONBOARDING_CONFIG' > /config/configuration.yaml"
+    echo "shrimp" | sudo -S sh -c "echo '$ONBOARDING_CONFIG' > "$HA_CONFIG_PATH""
 fi
 
 # Create .storage/onboarding file to mark onboarding as complete
 print_status "Creating onboarding completion marker..."
-docker exec homeassistant mkdir -p /config/.storage
-docker exec homeassistant sh -c 'cat > /config/.storage/onboarding << EOF
+echo "shrimp" | sudo -S mkdir -p /home/shrimp/homeassistant/config/.storage
+echo "shrimp" | sudo -S sh -c 'cat > /home/shrimp/homeassistant/config/.storage/onboarding << EOF
 {
   "data": {
     "done": [
@@ -94,7 +103,7 @@ EOF'
 
 # Create .storage/auth file to skip authentication if needed
 print_status "Creating authentication configuration..."
-docker exec homeassistant sh -c 'cat > /config/.storage/auth << EOF
+echo "shrimp" | sudo -S sh -c 'cat > /home/shrimp/homeassistant/config/.storage/auth << EOF
 {
   "data": {
     "users": [
@@ -113,7 +122,7 @@ docker exec homeassistant sh -c 'cat > /config/.storage/auth << EOF
 EOF'
 
 # Create .storage/auth_providers file
-docker exec homeassistant sh -c 'cat > /config/.storage/auth_providers << EOF
+echo "shrimp" | sudo -S sh -c 'cat > /home/shrimp/homeassistant/config/.storage/auth_providers << EOF
 {
   "data": {
     "auth_providers": [
