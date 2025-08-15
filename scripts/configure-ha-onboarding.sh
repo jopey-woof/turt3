@@ -4,6 +4,16 @@
 
 set -e
 
+# Define the password for sudo operations
+SUDO_PASSWORD="shrimp"
+ASKPASS_SCRIPT="$(mktemp)"
+echo "echo \"$SUDO_PASSWORD\"" > "$ASKPASS_SCRIPT"
+chmod +x "$ASKPASS_SCRIPT"
+export SUDO_ASKPASS="$ASKPASS_SCRIPT"
+
+# Ensure ASKPASS_SCRIPT is cleaned up on exit
+trap 'rm -f "$ASKPASS_SCRIPT"' EXIT
+
 # Color functions
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -45,13 +55,13 @@ HA_CONFIG_PATH="/home/shrimp/homeassistant/config/configuration.yaml"
 # Check if configuration.yaml exists on the host
 if [ -f "$HA_CONFIG_PATH" ]; then
     print_status "Backing up existing configuration.yaml..."
-    echo "shrimp" | sudo -S cp "$HA_CONFIG_PATH" "$HA_CONFIG_PATH.backup"
+    sudo -A cp "$HA_CONFIG_PATH" "$HA_CONFIG_PATH.backup"
     
     # Check if onboarding is already configured
     if grep -q "onboarding:" "$HA_CONFIG_PATH"; then
         print_status "Onboarding configuration already exists, updating..."
         # Remove existing onboarding section and any lines indented below it
-        echo "shrimp" | sudo -S sed -i '/^onboarding:/,/^[^ ].*/d' "$HA_CONFIG_PATH"
+        sudo -A sed -i '/^onboarding:/,/^[^ ].*/d' "$HA_CONFIG_PATH"
     fi
     
     # Ensure a newline at the end of the file before appending, if it's not empty
@@ -61,22 +71,22 @@ if [ -f "$HA_CONFIG_PATH" ]; then
             :
         else
             # File does not end with a newline, add one
-            echo "shrimp" | sudo -S sh -c 'echo "" >> "$HA_CONFIG_PATH"'
+            sudo -A sh -c 'echo "" >> "$HA_CONFIG_PATH"'
         fi
     fi
     
     # Add onboarding configuration
     print_status "Adding onboarding skip configuration..."
-    echo "shrimp" | sudo -S sh -c "echo '$ONBOARDING_CONFIG' >> "$HA_CONFIG_PATH""
+    sudo -A sh -c "echo '$ONBOARDING_CONFIG' >> "$HA_CONFIG_PATH""
 else
     print_status "Creating new configuration.yaml..."
-    echo "shrimp" | sudo -S sh -c "echo '$ONBOARDING_CONFIG' > "$HA_CONFIG_PATH""
+    sudo -A sh -c "echo '$ONBOARDING_CONFIG' > "$HA_CONFIG_PATH""
 fi
 
 # Create .storage/onboarding file to mark onboarding as complete
 print_status "Creating onboarding completion marker..."
-echo "shrimp" | sudo -S mkdir -p /home/shrimp/homeassistant/config/.storage
-echo "shrimp" | sudo -S sh -c 'cat > /home/shrimp/homeassistant/config/.storage/onboarding << EOF
+sudo -A mkdir -p /home/shrimp/homeassistant/config/.storage
+sudo -A sh -c 'cat > /home/shrimp/homeassistant/config/.storage/onboarding << EOF
 {
   "data": {
     "done": [
@@ -103,7 +113,7 @@ EOF'
 
 # Create .storage/auth file to skip authentication if needed
 print_status "Creating authentication configuration..."
-echo "shrimp" | sudo -S sh -c 'cat > /home/shrimp/homeassistant/config/.storage/auth << EOF
+sudo -A sh -c 'cat > /home/shrimp/homeassistant/config/.storage/auth << EOF
 {
   "data": {
     "users": [
@@ -122,7 +132,8 @@ echo "shrimp" | sudo -S sh -c 'cat > /home/shrimp/homeassistant/config/.storage/
 EOF'
 
 # Create .storage/auth_providers file
-echo "shrimp" | sudo -S sh -c 'cat > /home/shrimp/homeassistant/config/.storage/auth_providers << EOF
+print_status "Creating authentication providers configuration..."
+sudo -A sh -c 'cat > /home/shrimp/homeassistant/config/.storage/auth_providers << EOF
 {
   "data": {
     "auth_providers": [
