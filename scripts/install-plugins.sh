@@ -73,6 +73,18 @@ else
     git clone https://github.com/piitaya/lovelace-mushroom.git mushroom
 fi
 
+# Find the actual mushroom.js file and move it to the expected location
+if [[ ! -f "mushroom/mushroom.js" ]]; then
+    MUSHROOM_JS_PATH=$(find mushroom -name "mushroom.js" -print -quit)
+    if [[ -n "$MUSHROOM_JS_PATH" ]]; then
+        print_status "Found mushroom.js at $MUSHROOM_JS_PATH, moving to mushroom/mushroom.js"
+        mv "$MUSHROOM_JS_PATH" mushroom/
+    else
+        print_error "Could not find mushroom.js in the cloned repository."
+        exit 1
+    fi
+fi
+
 # Verify Mushroom installation
 if [[ -f "mushroom/mushroom.js" ]]; then
     print_success "Mushroom Cards installed successfully"
