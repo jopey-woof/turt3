@@ -30,7 +30,7 @@ print_error() {
 print_status "Configuring Home Assistant to skip onboarding..."
 
 # Check if Home Assistant container is running
-if ! docker ps | grep -q homeassistant; then
+if ! docker compose -f /opt/homeassistant/docker-compose.yml ps | grep -q homeassistant; then
     print_error "Home Assistant container is not running. Please start it first."
     exit 1
 fi
