@@ -1,7 +1,7 @@
 [Unit]
 Description=Turtle Enclosure Auto-Calibration Service
-After=kiosk.service
-Wants=kiosk.service
+# After=kiosk.service
+# Wants=kiosk.service
 
 [Service]
 Type=oneshot
@@ -14,4 +14,5 @@ RemainAfterExit=yes
 TimeoutStartSec=300
 
 [Install]
-WantedBy=multi-user.target 
+# Temporarily disable auto-calibration service to prevent interference
+# WantedBy=multi-user.target 
