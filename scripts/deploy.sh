@@ -223,8 +223,9 @@ print_status "Creating systemd override directory..."
 sudo mkdir -p /etc/systemd/system/getty@tty1.service.d/
 sudo cp kiosk/autologin.conf /etc/systemd/system/getty@tty1.service.d/
 
+# Make the display configuration script executable and then run it
 sudo chmod +x kiosk/display-config.sh
-sudo ./kiosk/display-config.sh
+sudo bash kiosk/display-config.sh
 
 # Setup touchscreen calibration and merge configurations
 setup_touchscreen
@@ -269,6 +270,10 @@ sudo udevadm trigger
 print_status "Setting up Home Assistant configuration..."
 sudo mkdir -p /opt/homeassistant/config
 sudo chown -R turtle:turtle /opt/homeassistant
+
+# Install Home Assistant Plugins (Mushroom Cards, Kiosk Mode)
+print_status "Installing Home Assistant plugins (Mushroom Cards, Kiosk Mode)..."
+sudo bash ./scripts/install-plugins-fixed.sh
 
 # Copy Home Assistant configurations
 sudo cp -r home-assistant/* /opt/homeassistant/config/

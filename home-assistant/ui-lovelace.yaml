@@ -1,32 +1,355 @@
-# Turtle Enclosure Dashboard
-# Basic Lovelace UI configuration
+# Turtle Enclosure Dashboard Configuration
+# Enhanced dashboard with turtle theme and Mushroom cards
+# Optimized for 10.1" touchscreen display
 
 title: Turtle Enclosure
 views:
-  - title: Overview
-    path: overview
+  - title: Dashboard
+    path: dashboard
     type: custom:grid-layout
+    layout:
+      grid-template-columns: repeat(4, 1fr)
+      grid-template-rows: repeat(3, 1fr)
+      grid-gap: 20px
+      padding: 20px
     badges: []
+    theme: turtle-theme
     cards:
-      - type: vertical-stack
-        cards:
-          - type: entities
-            title: System Status
-            entities:
-              - entity: input_boolean.day_mode
-              - entity: input_boolean.auto_cooling
-              - entity: input_boolean.maintenance_mode
-              - entity: input_boolean.health_check_running
-            show_header_toggle: false
-            
-          - type: entities
-            title: Environmental Conditions
-            entities:
-              - entity: sensor.temperature
-              - entity: sensor.humidity
-            show_header_toggle: false
-            
-          - type: picture-entity
-            entity: camera.turtle_camera
-            name: Live Camera Feed
-            camera_view: live 
+      # Temperature Card (Mushroom) - Top Left
+      - type: custom:mushroom-template-card
+        primary: Temperature
+        secondary: "{{ states('sensor.temperature_fallback') }}°F"
+        icon: mdi:thermometer
+        icon_color: |
+          {% set temp = states('sensor.temperature_fallback') | float %}
+          {% if temp < 70 %}
+            #4682b4
+          {% elif temp > 85 %}
+            #dc143c
+          {% elif temp > 80 %}
+            #ff8c00
+          {% else %}
+            #228b22
+          {% endif %}
+        layout: vertical
+        fill_container: true
+        grid_position:
+          x: 0
+          y: 0
+          w: 1
+          h: 1
+        card_mod:
+          class: temperature-card
+
+      # Humidity Card (Mushroom) - Top Right
+      - type: custom:mushroom-template-card
+        primary: Humidity
+        secondary: "{{ states('sensor.humidity_fallback') }}%"
+        icon: mdi:water-percent
+        icon_color: |
+          {% set humidity = states('sensor.humidity_fallback') | float %}
+          {% if humidity < 60 %}
+            #ff8c00
+          {% elif humidity > 80 %}
+            #4682b4
+          {% else %}
+            #228b22
+          {% endif %}
+        layout: vertical
+        fill_container: true
+        grid_position:
+          x: 1
+          y: 0
+          w: 1
+          h: 1
+        card_mod:
+          class: humidity-card
+
+      # Camera Card - Large Center
+      - type: picture-entity
+        entity: camera.turtle_camera
+        name: Turtle Camera
+        camera_view: live
+        aspect_ratio: 16:9
+        grid_position:
+          x: 2
+          y: 0
+          w: 2
+          h: 2
+        card_mod:
+          class: camera-card
+
+      # Day Mode Toggle (Mushroom Chips) - Bottom Left
+      - type: custom:mushroom-chips-card
+        alignment: start
+        chips:
+          - type: template
+            icon: mdi:weather-sunny
+            icon_color: |
+              {% if is_state('input_boolean.day_mode', 'on') %}
+                #ffd700
+              {% else %}
+                #8b7355
+              {% endif %}
+            tap_action:
+              action: toggle
+              entity: input_boolean.day_mode
+            hold_action:
+              action: call-service
+              service: script.day_mode_toggle
+        grid_position:
+          x: 0
+          y: 1
+          w: 2
+          h: 1
+        card_mod:
+          class: control-card
+
+      # Auto Cooling Toggle (Mushroom Chips) - Bottom Right
+      - type: custom:mushroom-chips-card
+        alignment: start
+        chips:
+          - type: template
+            icon: mdi:snowflake
+            icon_color: |
+              {% if is_state('input_boolean.auto_cooling', 'on') %}
+                #4682b4
+              {% else %}
+                #8b7355
+              {% endif %}
+            tap_action:
+              action: toggle
+              entity: input_boolean.auto_cooling
+            hold_action:
+              action: call-service
+              service: script.emergency_cooling
+        grid_position:
+          x: 2
+          y: 1
+          w: 2
+          h: 1
+        card_mod:
+          class: control-card
+
+      # System Status (Mushroom) - Bottom Center
+      - type: custom:mushroom-template-card
+        primary: System Status
+        secondary: |
+          {% if is_state('input_boolean.maintenance_mode', 'on') %}
+            Maintenance Mode
+          {% elif is_state('input_boolean.health_check_running', 'on') %}
+            Health Check Running
+          {% else %}
+            Normal Operation
+          {% endif %}
+        icon: mdi:heart-pulse
+        icon_color: |
+          {% if is_state('input_boolean.maintenance_mode', 'on') %}
+            #ff8c00
+          {% elif is_state('input_boolean.health_check_running', 'on') %}
+            #4682b4
+          {% else %}
+            #228b22
+          {% endif %}
+        layout: vertical
+        fill_container: true
+        grid_position:
+          x: 0
+          y: 2
+          w: 2
+          h: 1
+        card_mod:
+          class: status-card
+
+      # Quick Actions (Mushroom Chips) - Bottom Right
+      - type: custom:mushroom-chips-card
+        alignment: start
+        chips:
+          - type: template
+            icon: mdi:refresh
+            icon_color: "#228b22"
+            tap_action:
+              action: call-service
+              service: script.health_check
+          - type: template
+            icon: mdi:backup-restore
+            icon_color: "#8b4513"
+            tap_action:
+              action: call-service
+              service: script.backup_system
+          - type: template
+            icon: mdi:settings
+            icon_color: "#708090"
+            tap_action:
+              action: navigate
+              navigation_path: /config
+        grid_position:
+          x: 2
+          y: 2
+          w: 2
+          h: 1
+        card_mod:
+          class: control-card
+
+  # Settings View
+  - title: Settings
+    path: settings
+    type: panel
+    theme: turtle-theme
+    cards:
+      - type: entities
+        title: System Controls
+        theme: turtle-theme
+        entities:
+          - entity: input_boolean.day_mode
+            name: Day Mode
+            icon: mdi:weather-sunny
+          - entity: input_boolean.auto_cooling
+            name: Auto Cooling
+            icon: mdi:snowflake
+          - entity: input_boolean.maintenance_mode
+            name: Maintenance Mode
+            icon: mdi:wrench
+          - entity: input_boolean.health_check_running
+            name: Health Check Status
+            icon: mdi:heart-pulse
+
+      - type: entities
+        title: Environmental Sensors
+        theme: turtle-theme
+        entities:
+          - entity: sensor.temperature_fallback
+            name: Temperature
+            icon: mdi:thermometer
+          - entity: sensor.humidity_fallback
+            name: Humidity
+            icon: mdi:water-percent
+          - entity: camera.turtle_camera
+            name: Camera
+            icon: mdi:camera
+
+      - type: entities
+        title: System Scripts
+        theme: turtle-theme
+        entities:
+          - entity: script.health_check
+            name: Run Health Check
+            icon: mdi:heart-pulse
+          - entity: script.backup_system
+            name: Backup System
+            icon: mdi:backup-restore
+          - entity: script.emergency_cooling
+            name: Emergency Cooling
+            icon: mdi:snowflake-alert
+
+  # Monitoring View
+  - title: Monitoring
+    path: monitoring
+    type: panel
+    theme: turtle-theme
+    cards:
+      - type: custom:mushroom-template-card
+        primary: Temperature Trend
+        secondary: "{{ states('sensor.temperature_fallback') }}°F"
+        icon: mdi:chart-line
+        icon_color: |
+          {% set temp = states('sensor.temperature_fallback') | float %}
+          {% if temp < 70 %}
+            #4682b4
+          {% elif temp > 85 %}
+            #dc143c
+          {% elif temp > 80 %}
+            #ff8c00
+          {% else %}
+            #228b22
+          {% endif %}
+        layout: vertical
+        fill_container: true
+
+      - type: custom:mushroom-template-card
+        primary: Humidity Trend
+        secondary: "{{ states('sensor.humidity_fallback') }}%"
+        icon: mdi:chart-line
+        icon_color: |
+          {% set humidity = states('sensor.humidity_fallback') | float %}
+          {% if humidity < 60 %}
+            #ff8c00
+          {% elif humidity > 80 %}
+            #4682b4
+          {% else %}
+            #228b22
+          {% endif %}
+        layout: vertical
+        fill_container: true
+
+      - type: entities
+        title: System Logs
+        theme: turtle-theme
+        entities:
+          - entity: sensor.last_boot
+            name: Last Boot
+            icon: mdi:clock-outline
+          - entity: sensor.system_load
+            name: System Load
+            icon: mdi:server
+          - entity: sensor.memory_usage
+            name: Memory Usage
+            icon: mdi:memory
+
+# Theme Configuration
+theme: turtle-theme
+
+# Custom CSS for additional styling
+styles:
+  - |
+    /* Additional turtle-themed styling */
+    .turtle-header {
+      background: linear-gradient(135deg, #2d5016 0%, #3a5f1f 100%);
+      color: #f4f1e8;
+      padding: 16px;
+      border-radius: 16px;
+      margin-bottom: 20px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: 700;
+      box-shadow: 0 6px 16px rgba(45, 80, 22, 0.2);
+    }
+    
+    .turtle-footer {
+      background: linear-gradient(135deg, #e8dcc0 0%, #d2b48c 100%);
+      padding: 12px;
+      border-radius: 12px;
+      margin-top: 20px;
+      text-align: center;
+      font-size: 14px;
+      color: #5a4a3f;
+    }
+    
+    /* Enhanced touch targets */
+    .touch-target {
+      min-height: 56px;
+      min-width: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+    }
+    
+    .touch-target:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 16px rgba(45, 80, 22, 0.2);
+    }
+    
+    /* Turtle shell pattern background */
+    .turtle-background {
+      background: radial-gradient(circle at 30% 30%, rgba(139, 69, 19, 0.03) 0%, rgba(160, 82, 45, 0.02) 25%, rgba(205, 133, 63, 0.01) 50%, rgba(222, 184, 135, 0.01) 75%, rgba(245, 222, 179, 0.01) 100%);
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: -1;
+      pointer-events: none;
+    } 

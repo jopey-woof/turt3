@@ -1,5 +1,6 @@
-# Turtle Enclosure Theme
+# Turtle Enclosure Theme - Enhanced Edition
 # Nature-inspired theme with organic colors and turtle aesthetics
+# Optimized for Mushroom Cards and touchscreen interface
 
 turtle-theme:
   # Primary Colors - Natural Earth Tones
@@ -21,7 +22,7 @@ turtle-theme:
   # Card Colors
   card-background-color: "#faf8f3"  # Light Cream
   card-rgb-color: "250, 248, 243"
-  card-background-opacity: 0.9
+  card-background-opacity: 0.95
   
   # Header Colors
   app-header-background-color: "#2d5016"  # Forest Green
@@ -58,129 +59,199 @@ turtle-theme:
   success-color: "#228b22"  # Forest Green
   
   # Custom CSS for turtle-themed elements
-  ha-card-border-radius: "12px"
-  ha-card-box-shadow: "0 4px 8px rgba(45, 80, 22, 0.1)"
+  ha-card-border-radius: "16px"
+  ha-card-box-shadow: "0 6px 16px rgba(45, 80, 22, 0.12)"
   
   # Custom CSS Variables
   --turtle-shell-pattern: "radial-gradient(circle at 30% 30%, #8b4513 0%, #a0522d 25%, #cd853f 50%, #deb887 75%, #f5deb3 100%)"
   --leaf-pattern: "linear-gradient(45deg, #2d5016 0%, #3a5f1f 25%, #4a6b2a 50%, #5a7a35 75%, #6a8940 100%)"
   --water-ripple: "radial-gradient(circle, rgba(70, 130, 180, 0.3) 0%, rgba(70, 130, 180, 0.1) 50%, transparent 100%)"
+  --mushroom-card-shadow: "0 8px 24px rgba(45, 80, 22, 0.15)"
+  --mushroom-card-hover-shadow: "0 12px 32px rgba(45, 80, 22, 0.25)"
   
   # Font Settings
   --turtle-font: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
-  --turtle-font-size-large: "24px"
-  --turtle-font-size-medium: "18px"
-  --turtle-font-size-small: "14px"
+  --turtle-font-size-large: "28px"
+  --turtle-font-size-medium: "20px"
+  --turtle-font-size-small: "16px"
   
   # Animation Settings
-  --turtle-transition: "all 0.3s ease-in-out"
-  --turtle-hover-scale: "1.02"
+  --turtle-transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)"
+  --turtle-hover-scale: "1.03"
   
-  # Custom CSS for enhanced turtle theming
+  # Enhanced Card Styling
   ha-card:
-    border-radius: "12px"
-    box-shadow: "0 4px 12px rgba(45, 80, 22, 0.15)"
-    transition: "all 0.3s ease-in-out"
+    border-radius: "16px"
+    box-shadow: "var(--mushroom-card-shadow)"
+    transition: "var(--turtle-transition)"
     background: "linear-gradient(135deg, #faf8f3 0%, #f4f1e8 100%)"
+    border: "1px solid rgba(45, 80, 22, 0.08)"
+    overflow: "hidden"
     
   ha-card:hover:
-    transform: "translateY(-2px)"
-    box-shadow: "0 6px 16px rgba(45, 80, 22, 0.2)"
+    transform: "translateY(-4px) scale(var(--turtle-hover-scale))"
+    box-shadow: "var(--mushroom-card-hover-shadow)"
     
+  # Mushroom Card Specific Styling
+  mushroom-template-card:
+    border-radius: "16px"
+    background: "linear-gradient(135deg, #faf8f3 0%, #f4f1e8 100%)"
+    box-shadow: "var(--mushroom-card-shadow)"
+    transition: "var(--turtle-transition)"
+    
+  mushroom-template-card:hover:
+    transform: "translateY(-4px) scale(var(--turtle-hover-scale))"
+    box-shadow: "var(--mushroom-card-hover-shadow)"
+    
+  mushroom-chips-card:
+    border-radius: "12px"
+    background: "linear-gradient(135deg, #f0f8f0 0%, #e8f5e8 100%)"
+    box-shadow: "0 4px 12px rgba(45, 80, 22, 0.1)"
+    
+  # Specialized Card Types
   .temperature-card:
     background: "linear-gradient(135deg, #fff8dc 0%, #f5deb3 100%)"
-    border-left: "4px solid #d2691e"
+    border-left: "6px solid #d2691e"
+    position: "relative"
+    
+  .temperature-card::before:
+    content: ""
+    position: "absolute"
+    top: "0"
+    left: "0"
+    right: "0"
+    bottom: "0"
+    background: "var(--turtle-shell-pattern)"
+    opacity: "0.05"
+    pointer-events: "none"
     
   .humidity-card:
     background: "linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%)"
-    border-left: "4px solid #4682b4"
+    border-left: "6px solid #4682b4"
+    position: "relative"
+    
+  .humidity-card::before:
+    content: ""
+    position: "absolute"
+    top: "0"
+    left: "0"
+    right: "0"
+    bottom: "0"
+    background: "var(--water-ripple)"
+    opacity: "0.1"
+    pointer-events: "none"
     
   .camera-card:
     background: "linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%)"
-    border-left: "4px solid #708090"
+    border-left: "6px solid #708090"
+    border-radius: "16px"
+    overflow: "hidden"
     
   .control-card:
     background: "linear-gradient(135deg, #f0fff0 0%, #e8f5e8 100%)"
-    border-left: "4px solid #228b22"
+    border-left: "6px solid #228b22"
     
-  .alert-card:
+  .status-card:
     background: "linear-gradient(135deg, #fff5f5 0%, #ffe6e6 100%)"
-    border-left: "4px solid #dc143c"
+    border-left: "6px solid #dc143c"
     
-  # Turtle-themed button styles
+  # Enhanced Button Styling
   mwc-button:
-    border-radius: "8px"
+    border-radius: "12px"
     font-weight: "600"
     text-transform: "none"
-    transition: "all 0.3s ease-in-out"
+    transition: "var(--turtle-transition)"
+    font-size: "16px"
+    padding: "12px 20px"
     
   mwc-button:hover:
-    transform: "scale(1.02)"
-    box-shadow: "0 4px 8px rgba(45, 80, 22, 0.2)"
+    transform: "scale(1.05)"
+    box-shadow: "0 6px 16px rgba(45, 80, 22, 0.25)"
     
-  # Custom icon colors for turtle theme
+  # Touch-Optimized Elements
+  .touch-button:
+    min-height: "56px"
+    min-width: "56px"
+    font-size: "20px"
+    padding: "16px 20px"
+    border-radius: "12px"
+    font-weight: "600"
+    
+  .touch-text:
+    font-size: "22px"
+    line-height: "1.5"
+    font-weight: "500"
+    
+  # Icon Styling
   .turtle-icon:
     color: "#2d5016"
+    font-size: "24px"
     
   .temperature-icon:
     color: "#d2691e"
+    font-size: "28px"
     
   .humidity-icon:
     color: "#4682b4"
+    font-size: "28px"
     
   .camera-icon:
     color: "#708090"
+    font-size: "24px"
     
   .control-icon:
     color: "#228b22"
+    font-size: "24px"
     
-  # Status indicators with turtle shell pattern
+  # Status Indicators
   .status-indicator:
     background: "var(--turtle-shell-pattern)"
     border-radius: "50%"
-    width: "12px"
-    height: "12px"
+    width: "16px"
+    height: "16px"
     display: "inline-block"
-    margin-right: "8px"
+    margin-right: "12px"
+    box-shadow: "0 2px 4px rgba(45, 80, 22, 0.2)"
     
-  # Leaf-shaped progress bars
+  # Progress Bars
   .leaf-progress:
     background: "var(--leaf-pattern)"
-    border-radius: "8px"
-    height: "8px"
+    border-radius: "10px"
+    height: "12px"
     overflow: "hidden"
+    box-shadow: "inset 0 2px 4px rgba(0, 0, 0, 0.1)"
     
-  # Water ripple effects for humidity
+  # Water Ripple Effects
   .water-ripple:
     background: "var(--water-ripple)"
     border-radius: "50%"
-    animation: "ripple 2s infinite"
+    animation: "ripple 3s ease-in-out infinite"
     
   @keyframes ripple:
     0%:
       transform: "scale(1)"
-      opacity: "0.8"
+      opacity: "0.6"
     50%:
-      transform: "scale(1.1)"
-      opacity: "0.4"
+      transform: "scale(1.2)"
+      opacity: "0.2"
     100%:
       transform: "scale(1)"
-      opacity: "0.8"
+      opacity: "0.6"
       
-  # Gentle leaf sway animation
+  # Leaf Sway Animation
   .leaf-sway:
-    animation: "sway 3s ease-in-out infinite"
+    animation: "sway 4s ease-in-out infinite"
     
   @keyframes sway:
     0%, 100%:
       transform: "rotate(0deg)"
     50%:
-      transform: "rotate(2deg)"
+      transform: "rotate(3deg)"
       
-  # Shell pattern background for main areas
+  # Shell Pattern Background
   .shell-background:
     background: "var(--turtle-shell-pattern)"
-    opacity: "0.05"
+    opacity: "0.03"
     position: "absolute"
     top: "0"
     left: "0"
@@ -188,32 +259,124 @@ turtle-theme:
     bottom: "0"
     z-index: "-1"
     
-  # Touch-optimized button sizes
-  .touch-button:
-    min-height: "48px"
-    min-width: "48px"
-    font-size: "18px"
-    padding: "12px 16px"
+  # Enhanced Focus States
+  .focus-visible:
+    outline: "3px solid #2d5016"
+    outline-offset: "3px"
     border-radius: "8px"
     
-  # Large, readable text for touchscreen
-  .touch-text:
-    font-size: "20px"
-    line-height: "1.4"
-    font-weight: "500"
-    
-  # Enhanced focus states for accessibility
-  .focus-visible:
-    outline: "2px solid #2d5016"
-    outline-offset: "2px"
-    
-  # Seasonal color variations
+  # Seasonal Variations
   .day-mode:
     --primary-color: "#2d5016"
     --accent-color: "#8b4513"
+    --card-background-color: "#faf8f3"
     
   .night-mode:
     --primary-color: "#1a3d0f"
     --accent-color: "#5a4a3f"
     --card-background-color: "#2a2a2a"
-    --text-primary-color: "#f4f1e8" 
+    --text-primary-color: "#f4f1e8"
+    
+  # Mushroom Card Enhancements
+  mushroom-template-card .primary:
+    font-size: "24px"
+    font-weight: "700"
+    color: "#2d5016"
+    margin-bottom: "8px"
+    
+  mushroom-template-card .secondary:
+    font-size: "20px"
+    font-weight: "500"
+    color: "#5a4a3f"
+    
+  mushroom-template-card .icon:
+    font-size: "32px"
+    margin-bottom: "12px"
+    
+  # Chips Card Styling
+  mushroom-chips-card .chip:
+    border-radius: "20px"
+    padding: "12px 20px"
+    font-size: "18px"
+    font-weight: "600"
+    transition: "var(--turtle-transition)"
+    box-shadow: "0 4px 8px rgba(45, 80, 22, 0.1)"
+    
+  mushroom-chips-card .chip:hover:
+    transform: "scale(1.05)"
+    box-shadow: "0 6px 16px rgba(45, 80, 22, 0.2)"
+    
+  # Grid Layout Enhancements
+  .grid-layout:
+    gap: "20px"
+    padding: "20px"
+    
+  # Header Styling
+  .app-header:
+    background: "linear-gradient(135deg, #2d5016 0%, #3a5f1f 100%)"
+    box-shadow: "0 4px 12px rgba(45, 80, 22, 0.2)"
+    
+  # Sidebar Styling
+  .sidebar:
+    background: "linear-gradient(180deg, #2d5016 0%, #1a3d0f 100%)"
+    
+  # Loading Animation
+  .loading-turtle:
+    animation: "turtle-walk 2s ease-in-out infinite"
+    
+  @keyframes turtle-walk:
+    0%, 100%:
+      transform: "translateX(0)"
+    50%:
+      transform: "translateX(10px)"
+      
+  # Notification Styling
+  .notification:
+    background: "linear-gradient(135deg, #faf8f3 0%, #f4f1e8 100%)"
+    border-radius: "12px"
+    border-left: "4px solid #2d5016"
+    box-shadow: "0 6px 16px rgba(45, 80, 22, 0.15)"
+    
+  # Temperature Range Indicators
+  .temp-cold:
+    color: "#4682b4"
+    
+  .temp-normal:
+    color: "#228b22"
+    
+  .temp-warm:
+    color: "#ff8c00"
+    
+  .temp-hot:
+    color: "#dc143c"
+    
+  # Humidity Range Indicators
+  .humidity-low:
+    color: "#ff8c00"
+    
+  .humidity-normal:
+    color: "#228b22"
+    
+  .humidity-high:
+    color: "#4682b4"
+    
+  # Camera Feed Enhancement
+  picture-entity:
+    border-radius: "16px"
+    overflow: "hidden"
+    box-shadow: "var(--mushroom-card-shadow)"
+    
+  # Responsive Design
+  @media (max-width: 768px):
+    --turtle-font-size-large: "24px"
+    --turtle-font-size-medium: "18px"
+    --turtle-font-size-small: "14px"
+    
+    .touch-button:
+      min-height: "48px"
+      min-width: "48px"
+      font-size: "18px"
+      padding: "12px 16px"
+      
+    .touch-text:
+      font-size: "20px" 
