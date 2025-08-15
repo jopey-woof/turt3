@@ -47,8 +47,13 @@ if docker exec homeassistant test -f /config/configuration.yaml; then
     # Check if onboarding is already configured
     if docker exec homeassistant grep -q "onboarding:" /config/configuration.yaml; then
         print_status "Onboarding configuration already exists, updating..."
-        # Remove existing onboarding section
-        docker exec homeassistant sed -i '/^onboarding:/,/^[^ ]/d' /config/configuration.yaml
+        # Remove existing onboarding section and any lines indented below it
+        docker exec homeassistant sed -i '/^onboarding:/,/^[^ ].*/d' /config/configuration.yaml
+    fi
+    
+    # Ensure a newline at the end of the file before appending, if it's not empty
+    if docker exec homeassistant test -s /config/configuration.yaml; then
+        docker exec homeassistant sh -c '[ -z "$(tail -c 1 /config/configuration.yaml)" ] || echo "" >> /config/configuration.yaml'
     fi
     
     # Add onboarding configuration
