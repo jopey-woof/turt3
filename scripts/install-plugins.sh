@@ -56,7 +56,7 @@ fi
 
 # Check if Home Assistant is running
 print_status "Checking Home Assistant status..."
-if ! docker compose ps | grep -q homeassistant; then
+if ! docker compose -f /opt/homeassistant/docker-compose.yml ps | grep -q homeassistant; then
     print_error "Home Assistant container is not running. Please start it first."
     exit 1
 fi
@@ -191,14 +191,14 @@ sudo -A chmod -R 755 "$HA_CONFIG_DIR"
 print_status "Restarting Home Assistant..."
 cd /opt/homeassistant
 # No sudo needed here as docker-compose should be managed by the user
-docker compose restart homeassistant
+docker compose -f /opt/homeassistant/docker-compose.yml restart homeassistant
 
 # Wait for Home Assistant to start
 print_status "Waiting for Home Assistant to start..."
 sleep 30
 
 # Check if Home Assistant is running
-if docker compose ps | grep -q homeassistant; then
+if docker compose -f /opt/homeassistant/docker-compose.yml ps | grep -q homeassistant; then
     print_success "Home Assistant restarted successfully"
 else
     print_error "Failed to restart Home Assistant"
@@ -211,7 +211,7 @@ sleep 10
 
 # Check logs for any errors
 print_status "Checking Home Assistant logs..."
-if docker logs homeassistant 2>&1 | grep -i "error\|failed" | grep -v "WARNING"; then
+if docker compose -f /opt/homeassistant/docker-compose.yml logs homeassistant 2>&1 | grep -i "error\|failed" | grep -v "WARNING"; then
     print_warning "Some errors found in logs, but plugins should still work"
 else
     print_success "No critical errors found in logs"
