@@ -214,6 +214,11 @@ pip3 install --user \
 # Create turtle user if it doesn't exist
 if ! id "turtle" &>/dev/null; then
     print_status "Creating turtle user..."
+    # Ensure docker group exists before adding user to it
+    if ! grep -q '^docker:' /etc/group; then
+        print_status "Creating docker group..."
+        sudo -A groupadd docker
+    fi
     sudo -A useradd -m -s /bin/bash turtle
     sudo -A usermod -aG video,audio,plugdev,docker turtle
     echo "turtle:$SUDO_PASSWORD" | sudo -A chpasswd
