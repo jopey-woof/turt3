@@ -355,7 +355,7 @@ bypass_onboarding
 
 # Install Home Assistant Plugins (Mushroom Cards, Kiosk Mode)
 print_status "Installing Home Assistant plugins (Mushroom Cards, Kiosk Mode)..."
-bash ./scripts/install-plugins.sh
+# bash ./scripts/install-plugins.sh # This line is removed as per the edit hint
 
 # Copy Home Assistant configurations
 sudo -A cp -r home-assistant/* /opt/homeassistant/config/
