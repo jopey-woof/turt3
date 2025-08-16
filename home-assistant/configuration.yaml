@@ -127,20 +127,16 @@ lovelace:
 input_boolean:
   day_mode:
     name: "Day Mode"
-    icon: "mdi:weather-sunny"
-    initial: off
+    icon: mdi:weather-sunny
   auto_cooling:
     name: "Auto Cooling"
-    icon: "mdi:snowflake"
-    initial: off
+    icon: mdi:snowflake
   maintenance_mode:
     name: "Maintenance Mode"
-    icon: "mdi:wrench"
-    initial: off
+    icon: mdi:wrench
   health_check_running:
     name: "Health Check Running"
-    icon: "mdi:heart-pulse"
-    initial: off
+    icon: mdi:heart-pulse
 
 # Include secrets
 secrets: !include secrets.yaml 
