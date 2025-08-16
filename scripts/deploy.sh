@@ -72,12 +72,14 @@ disable_ipv6() {
     print_status "Disabling IPv6..."
     
     # Disable IPv6 in sysctl
-    echo "net.ipv6.conf.all.disable_ipv6 = 1" | echo "$SUDO_PASSWORD" | sudo -S tee -a /etc/sysctl.conf
-    echo "net.ipv6.conf.default.disable_ipv6 = 1" | echo "$SUDO_PASSWORD" | sudo -S tee -a /etc/sysctl.conf
-    echo "net.ipv6.conf.lo.disable_ipv6 = 1" | echo "$SUDO_PASSWORD" | sudo -S tee -a /etc/sysctl.conf
+    echo "$SUDO_PASSWORD" | sudo -S tee /etc/sysctl.d/99-disable-ipv6.conf > /dev/null <<EOF
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+net.ipv6.conf.lo.disable_ipv6 = 1
+EOF
     
     # Apply sysctl changes
-    echo "$SUDO_PASSWORD" | sudo -S sysctl -p
+    echo "$SUDO_PASSWORD" | sudo -S sysctl -p /etc/sysctl.d/99-disable-ipv6.conf
     
     print_success "IPv6 disabled successfully!"
 }
@@ -574,7 +576,8 @@ echo "$SUDO_PASSWORD" | sudo -S chown turtle:turtle /opt/homeassistant/monitor.s
 echo "$SUDO_PASSWORD" | sudo -S chmod +x /opt/homeassistant/monitor.sh
 
 # Create cron job for monitoring
-(crontab -l 2>/dev/null; echo "*/5 * * * * /opt/homeassistant/monitor.sh") | crontab -
+CRON_JOB="*/5 * * * * /opt/homeassistant/monitor.sh"
+(echo "$SUDO_PASSWORD" | sudo -S crontab -l 2>/dev/null | grep -Fv "$CRON_JOB"; echo "$CRON_JOB") | echo "$SUDO_PASSWORD" | sudo -S crontab -
 
 # Create backup script
 print_status "Creating backup script..."
@@ -608,7 +611,8 @@ echo "$SUDO_PASSWORD" | sudo -S chown turtle:turtle /opt/homeassistant/backup.sh
 echo "$SUDO_PASSWORD" | sudo -S chmod +x /opt/homeassistant/backup.sh
 
 # Add daily backup to cron
-(crontab -l 2>/dev/null; echo "0 2 * * * /opt/homeassistant/backup.sh") | crontab -
+CRON_JOB="0 2 * * * /opt/homeassistant/backup.sh"
+(echo "$SUDO_PASSWORD" | sudo -S crontab -l 2>/dev/null | grep -Fv "$CRON_JOB"; echo "$CRON_JOB") | echo "$SUDO_PASSWORD" | sudo -S crontab -
 
 print_success "Deployment completed successfully!"
 
