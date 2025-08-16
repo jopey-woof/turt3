@@ -42,6 +42,8 @@ updater:
 webhook:
 zone:
 
+zeroconf:
+
 # Explicitly disable cloud integration to prevent Zeroconf conflicts
 cloud:
   enabled: false
