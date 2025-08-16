@@ -121,15 +121,11 @@ print_status "Creating plugins configuration file..."
 # Use sudo -S cat and sudo -S mv
 sudo cat > /tmp/plugins.yaml << 'EOF'
 # Mushroom Cards and Kiosk Mode Configuration
-
-# Enable Mushroom cards and Kiosk mode
-lovelace:
-  mode: storage
-  resources:
-    - url: /hacsfiles/mushroom/mushroom.js
-      type: module
-    - url: /local/www/kiosk-mode/kiosk-mode.js
-      type: module
+resources:
+  - url: /hacsfiles/mushroom/mushroom.js
+    type: module
+  - url: /local/www/kiosk-mode/kiosk-mode.js
+    type: module
 EOF
 sudo mv /tmp/plugins.yaml "$HA_CONFIG_DIR/packages/plugins.yaml"
 
@@ -146,23 +142,24 @@ fi
 
 # Update frontend configuration
 print_status "Updating frontend configuration..."
-if grep -q "frontend:" "$HA_CONFIG_DIR/configuration.yaml"; then
-    # Update existing frontend section - use sudo -S sed
-    sudo sed -i '/^frontend:/,/^[^ ]/ { /^frontend:/!d; }' "$HA_CONFIG_DIR/configuration.yaml"
-    sudo sed -i '/^frontend:/a\  themes: !include_dir_merge_named themes\n  extra_module_url:\n    - /hacsfiles/mushroom/mushroom.js\n    - /local/www/kiosk-mode/kiosk-mode.js' "$HA_CONFIG_DIR/configuration.yaml"
+if grep -q "lovelace:" "$HA_CONFIG_DIR/configuration.yaml"; then
+    # Update existing lovelace section - use sudo -S sed
+    sudo sed -i '/^lovelace:/a\  resources:\n    - url: /hacsfiles/mushroom/mushroom.js\n      type: module\n    - url: /local/www/kiosk-mode/kiosk-mode.js\n      type: module' "$HA_CONFIG_DIR/configuration.yaml"
 else
-    # Add new frontend section - use sudo -S cat
-    sudo cat > /tmp/frontend_config.yaml << 'EOF'
+    # Add new lovelace section - use sudo -S cat
+    sudo cat > /tmp/lovelace_config.yaml << 'EOF'
 
-# Frontend configuration with plugins
-frontend:
-  themes: !include_dir_merge_named themes
-  extra_module_url:
-    - /hacsfiles/mushroom/mushroom.js
-    - /local/www/kiosk-mode/kiosk-mode.js
+# Lovelace configuration with plugins
+lovelace:
+  mode: storage
+  resources:
+    - url: /hacsfiles/mushroom/mushroom.js
+      type: module
+    - url: /local/www/kiosk-mode/kiosk-mode.js
+      type: module
 EOF
-    sudo cat /tmp/frontend_config.yaml >> "$HA_CONFIG_DIR/configuration.yaml"
-    rm /tmp/frontend_config.yaml
+    sudo cat /tmp/lovelace_config.yaml >> "$HA_CONFIG_DIR/configuration.yaml"
+    rm /tmp/lovelace_config.yaml
 fi
 
 print_success "Frontend configuration updated"
