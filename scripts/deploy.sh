@@ -225,12 +225,6 @@ EOF
     print_success "Onboarding file created successfully!"
 }
 
-# Check if running as root
-if [[ $EUID -eq 0 ]]; then
-   print_error "This script should not be run as root. Please run as a regular user with sudo privileges."
-   exit 1
-fi
-
 # Check Ubuntu version
 if ! grep -q "Ubuntu 22.04" /etc/os-release; then
     print_warning "This script is designed for Ubuntu 22.04. Other versions may work but are not tested."
