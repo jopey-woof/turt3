@@ -39,14 +39,6 @@ print_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
-# Check if running as root
-# This script should ideally run as the 'shrimp' user (the user who ran deploy.sh)
-if [[ $EUID -eq 0 ]]; then
-   print_error "This script should not be run as root. It will attempt to use sudo -S with password pipe."
-   # The script will continue and use sudo -S, relying on the password pipe.
-   # It should be called by deploy.sh as the shrimp user.
-fi
-
 # Check if Home Assistant is running
 print_status "Checking Home Assistant status..."
 if ! docker compose -f /opt/homeassistant/docker-compose.yml ps | grep -q homeassistant; then
