@@ -124,19 +124,23 @@ lovelace:
   mode: storage
 
 # Input controls for system management
-#input_boolean:
-#  day_mode:
-#    name: "Day Mode"
-#    icon: "mdi:weather-sunny"
-#  auto_cooling:
-#    name: "Auto Cooling"
-#    icon: "mdi:snowflake"
-#  maintenance_mode:
-#    name: "Maintenance Mode"
-#    icon: "mdi:wrench"
-#  health_check_running:
-#    name: "Health Check Running"
-#    icon: "mdi:heart-pulse"
+input_boolean:
+  day_mode:
+    name: "Day Mode"
+    icon: "mdi:weather-sunny"
+    initial: off
+  auto_cooling:
+    name: "Auto Cooling"
+    icon: "mdi:snowflake"
+    initial: off
+  maintenance_mode:
+    name: "Maintenance Mode"
+    icon: "mdi:wrench"
+    initial: off
+  health_check_running:
+    name: "Health Check Running"
+    icon: "mdi:heart-pulse"
+    initial: off
 
 # Include secrets
 secrets: !include secrets.yaml 
