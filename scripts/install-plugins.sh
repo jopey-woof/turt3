@@ -121,11 +121,12 @@ print_status "Creating plugins configuration file..."
 # Use sudo -S cat and sudo -S mv
 sudo cat > /tmp/plugins.yaml << 'EOF'
 # Mushroom Cards and Kiosk Mode Configuration
-resources:
-  - url: /hacsfiles/mushroom/mushroom.js
-    type: module
-  - url: /local/www/kiosk-mode/kiosk-mode.js
-    type: module
+lovelace:
+  resources:
+    - url: /hacsfiles/mushroom/mushroom.js
+      type: module
+    - url: /local/www/kiosk-mode/kiosk-mode.js
+      type: module
 EOF
 sudo mv /tmp/plugins.yaml "$HA_CONFIG_DIR/packages/plugins.yaml"
 
@@ -139,30 +140,6 @@ if ! grep -q "packages: !include_dir_named packages" "$HA_CONFIG_DIR/configurati
     sudo sed -i '/^homeassistant:/a\  packages: !include_dir_named packages' "$HA_CONFIG_DIR/configuration.yaml"
     print_success "Added packages configuration to main config"
 fi
-
-# Update frontend configuration
-print_status "Updating frontend configuration..."
-if grep -q "lovelace:" "$HA_CONFIG_DIR/configuration.yaml"; then
-    # Update existing lovelace section - use sudo -S sed
-    sudo sed -i '/^lovelace:/a\  resources:\n    - url: /hacsfiles/mushroom/mushroom.js\n      type: module\n    - url: /local/www/kiosk-mode/kiosk-mode.js\n      type: module' "$HA_CONFIG_DIR/configuration.yaml"
-else
-    # Add new lovelace section - use sudo -S cat
-    sudo cat > /tmp/lovelace_config.yaml << 'EOF'
-
-# Lovelace configuration with plugins
-lovelace:
-  mode: storage
-  resources:
-    - url: /hacsfiles/mushroom/mushroom.js
-      type: module
-    - url: /local/www/kiosk-mode/kiosk-mode.js
-      type: module
-EOF
-    sudo cat /tmp/lovelace_config.yaml >> "$HA_CONFIG_DIR/configuration.yaml"
-    rm /tmp/lovelace_config.yaml
-fi
-
-print_success "Frontend configuration updated"
 
 # Set proper permissions (already in deploy.sh, but as a safeguard if run standalone)
 print_status "Setting proper permissions..."
