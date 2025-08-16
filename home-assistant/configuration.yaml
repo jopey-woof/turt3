@@ -12,7 +12,36 @@ homeassistant:
   packages: !include_dir_named packages
 
 # Core integrations (explicitly listed to avoid cloud integration)
-default_config:
+automation:
+config:
+counter:
+dhcp:
+energy:
+frontend:
+history:
+image:
+input_boolean:
+input_button:
+input_datetime:
+input_number:
+input_select:
+input_text:
+logbook:
+map:
+media_source:
+mobile_app:
+my:
+person:
+scene:
+script:
+shopping_list:
+sun:
+system_health:
+tag:
+timer:
+updater:
+webhook:
+zone:
 
 # Explicitly disable cloud integration to prevent Zeroconf conflicts
 cloud:
