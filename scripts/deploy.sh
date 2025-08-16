@@ -75,6 +75,21 @@ manage_kiosk() {
     fi
 }
 
+# Function to disable IPv6
+disable_ipv6() {
+    print_status "Disabling IPv6..."
+    
+    # Disable IPv6 in sysctl
+    echo "net.ipv6.conf.all.disable_ipv6 = 1" | sudo -A tee -a /etc/sysctl.conf
+    echo "net.ipv6.conf.default.disable_ipv6 = 1" | sudo -A tee -a /etc/sysctl.conf
+    echo "net.ipv6.conf.lo.disable_ipv6 = 1" | sudo -A tee -a /etc/sysctl.conf
+    
+    # Apply sysctl changes
+    sudo -A sysctl -p
+    
+    print_success "IPv6 disabled successfully!"
+}
+
 # Function to handle touchscreen calibration and configuration merging
 setup_touchscreen() {
     print_status "Setting up touchscreen calibration..."
@@ -416,6 +431,7 @@ def read_temperhum(device):
 
 def main():
     """Main function"""
+    disable_ipv6
     device = find_temperhum()
     
     if device is None:
@@ -606,6 +622,9 @@ print_success "Deployment completed successfully!"
 
 # Manage kiosk service
 manage_kiosk
+
+# Disable IPv6
+disable_ipv6
 
 # Clean up the temporary askpass script
 
