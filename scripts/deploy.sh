@@ -574,7 +574,7 @@ echo "$SUDO_PASSWORD" | sudo -S chown turtle:turtle /opt/homeassistant/monitor.s
 echo "$SUDO_PASSWORD" | sudo -S chmod +x /opt/homeassistant/monitor.sh
 
 # Create cron job for monitoring
-echo "*/5 * * * * /opt/homeassistant/monitor.sh" | echo "$SUDO_PASSWORD" | sudo -S crontab -
+(crontab -l 2>/dev/null; echo "*/5 * * * * /opt/homeassistant/monitor.sh") | crontab -
 
 # Create backup script
 print_status "Creating backup script..."
@@ -608,7 +608,7 @@ echo "$SUDO_PASSWORD" | sudo -S chown turtle:turtle /opt/homeassistant/backup.sh
 echo "$SUDO_PASSWORD" | sudo -S chmod +x /opt/homeassistant/backup.sh
 
 # Add daily backup to cron
-echo "0 2 * * * /opt/homeassistant/backup.sh" | echo "$SUDO_PASSWORD" | sudo -S crontab -
+(crontab -l 2>/dev/null; echo "0 2 * * * /opt/homeassistant/backup.sh") | crontab -
 
 print_success "Deployment completed successfully!"
 
