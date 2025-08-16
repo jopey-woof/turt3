@@ -14,11 +14,6 @@ homeassistant:
 # Core integrations (explicitly listed to avoid cloud integration)
 default_config:
 
-# Bypass onboarding for kiosk mode
-onboarding:
-  entries:
-    - done
-
 # Explicitly disable cloud integration to prevent Zeroconf conflicts
 cloud:
   enabled: false
