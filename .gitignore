@@ -2,6 +2,7 @@
 
 # Sensitive configuration files
 secrets.yaml
+home-assistant/secrets.yaml
 *.key
 *.pem
 *.crt
