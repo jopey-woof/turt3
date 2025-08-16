@@ -33,6 +33,9 @@ print_error() {
 }
 
 # Define the password for sudo operations
+SUDO_PASSWORD="shrimp"
+ASKPASS_SCRIPT=$(mktemp)
+export SUDO_ASKPASS="$ASKPASS_SCRIPT"
 
 # Create a temporary askpass script
 echo "#!/bin/bash" > "$ASKPASS_SCRIPT"
