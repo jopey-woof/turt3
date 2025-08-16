@@ -10,7 +10,6 @@ export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
 # Define the password for sudo operations (set to turtle123 for turtle user)
 # Allow override from environment variable for nested sudo calls
-SUDO_PASSWORD="shrimp"
 
 # NOTE: Removed ASKPASS_SCRIPT setup as it was unreliable in nested sudo -u calls.
 # Instead, we directly pipe the password to sudo -S.
@@ -68,10 +67,10 @@ print_status "Installing Mushroom Cards and Kiosk Mode plugins..."
 
 # Create necessary directories
 print_status "Creating directories..."
-echo "$SUDO_PASSWORD" | sudo -S mkdir -p "$HA_CONFIG_DIR/custom_components"
-echo "$SUDO_PASSWORD" | sudo -S mkdir -p "$HA_CONFIG_DIR/www/kiosk-mode"
-echo "$SUDO_PASSWORD" | sudo -S mkdir -p "$HA_CONFIG_DIR/www/mushroom" # Ensure mushroom www directory exists
-echo "$SUDO_PASSWORD" | sudo -S mkdir -p "$HA_CONFIG_DIR/packages"
+sudo mkdir -p "$HA_CONFIG_DIR/custom_components"
+sudo mkdir -p "$HA_CONFIG_DIR/www/kiosk-mode"
+sudo mkdir -p "$HA_CONFIG_DIR/www/mushroom" # Ensure mushroom www directory exists
+sudo mkdir -p "$HA_CONFIG_DIR/packages"
 
 # Install Mushroom Cards
 print_status "Installing Mushroom Cards..."
@@ -84,7 +83,7 @@ if [[ -f "mushroom.js" ]]; then
 fi
 print_status "Downloading Mushroom Cards plugin..."
 # Use sudo -S wget to ensure permissions are correct if running as turtle user but target is root-owned
-echo "$SUDO_PASSWORD" | sudo -S wget -q https://github.com/piitaya/lovelace-mushroom/releases/latest/download/mushroom.js
+sudo wget -q https://github.com/piitaya/lovelace-mushroom/releases/latest/download/mushroom.js
 
 # Verify Mushroom installation
 if [[ -f "mushroom.js" ]]; then
@@ -105,7 +104,7 @@ fi
 
 print_status "Downloading Kiosk Mode plugin..."
 # Use sudo -S wget here as well
-echo "$SUDO_PASSWORD" | sudo -S wget -q https://github.com/NemesisRE/kiosk-mode/releases/latest/download/kiosk-mode.js
+sudo wget -q https://github.com/NemesisRE/kiosk-mode/releases/latest/download/kiosk-mode.js
 
 # Verify Kiosk Mode installation
 if [[ -f "kiosk-mode.js" ]]; then
@@ -121,14 +120,14 @@ print_status "Configuring Home Assistant for plugins..."
 # Backup original configuration
 if [[ -f "$HA_CONFIG_DIR/configuration.yaml" ]]; then
     # Use sudo -S cp
-    echo "$SUDO_PASSWORD" | sudo -S cp "$HA_CONFIG_DIR/configuration.yaml" "$HA_CONFIG_DIR/configuration.yaml.backup.$(date +%Y%m%d_%H%M%S)"
+    sudo cp "$HA_CONFIG_DIR/configuration.yaml" "$HA_CONFIG_DIR/configuration.yaml.backup.$(date +%Y%m%d_%H%M%S)"
     print_status "Backup created: configuration.yaml.backup.$(date +%Y%m%d_%H%M%S)"
 fi
 
 # Create plugins configuration file
 print_status "Creating plugins configuration file..."
 # Use sudo -S cat and sudo -S mv
-echo "$SUDO_PASSWORD" | sudo -S cat > /tmp/plugins.yaml << 'EOF'
+sudo cat > /tmp/plugins.yaml << 'EOF'
 # Mushroom Cards and Kiosk Mode Configuration
 
 # Enable Mushroom cards and Kiosk mode
@@ -140,7 +139,7 @@ lovelace:
     - url: /local/www/kiosk-mode/kiosk-mode.js
       type: module
 EOF
-echo "$SUDO_PASSWORD" | sudo -S mv /tmp/plugins.yaml "$HA_CONFIG_DIR/packages/plugins.yaml"
+sudo mv /tmp/plugins.yaml "$HA_CONFIG_DIR/packages/plugins.yaml"
 
 print_success "Plugins configuration file created"
 
@@ -148,8 +147,8 @@ print_success "Plugins configuration file created"
 print_status "Updating main configuration..."
 if ! grep -q "packages: !include_dir_named packages" "$HA_CONFIG_DIR/configuration.yaml"; then
     # Add packages line after homeassistant section - use sudo -S sed
-    echo "$SUDO_PASSWORD" | sudo -S sed -i '/^homeassistant:/,/^[^ ]/ { /^[^ ]/!d; /^homeassistant:/!d; }' "$HA_CONFIG_DIR/configuration.yaml"
-    echo "$SUDO_PASSWORD" | sudo -S sed -i '/^homeassistant:/a\  packages: !include_dir_named packages' "$HA_CONFIG_DIR/configuration.yaml"
+    sudo sed -i '/^homeassistant:/,/^[^ ]/ { /^[^ ]/!d; /^homeassistant:/!d; }' "$HA_CONFIG_DIR/configuration.yaml"
+    sudo sed -i '/^homeassistant:/a\  packages: !include_dir_named packages' "$HA_CONFIG_DIR/configuration.yaml"
     print_success "Added packages configuration to main config"
 fi
 
@@ -157,11 +156,11 @@ fi
 print_status "Updating frontend configuration..."
 if grep -q "frontend:" "$HA_CONFIG_DIR/configuration.yaml"; then
     # Update existing frontend section - use sudo -S sed
-    echo "$SUDO_PASSWORD" | sudo -S sed -i '/^frontend:/,/^[^ ]/ { /^frontend:/!d; }' "$HA_CONFIG_DIR/configuration.yaml"
-    echo "$SUDO_PASSWORD" | sudo -S sed -i '/^frontend:/a\  themes: !include_dir_merge_named themes\n  extra_module_url:\n    - /hacsfiles/mushroom/mushroom.js\n    - /local/www/kiosk-mode/kiosk-mode.js' "$HA_CONFIG_DIR/configuration.yaml"
+    sudo sed -i '/^frontend:/,/^[^ ]/ { /^frontend:/!d; }' "$HA_CONFIG_DIR/configuration.yaml"
+    sudo sed -i '/^frontend:/a\  themes: !include_dir_merge_named themes\n  extra_module_url:\n    - /hacsfiles/mushroom/mushroom.js\n    - /local/www/kiosk-mode/kiosk-mode.js' "$HA_CONFIG_DIR/configuration.yaml"
 else
     # Add new frontend section - use sudo -S cat
-    echo "$SUDO_PASSWORD" | sudo -S cat > /tmp/frontend_config.yaml << 'EOF'
+    sudo cat > /tmp/frontend_config.yaml << 'EOF'
 
 # Frontend configuration with plugins
 frontend:
@@ -170,7 +169,7 @@ frontend:
     - /hacsfiles/mushroom/mushroom.js
     - /local/www/kiosk-mode/kiosk-mode.js
 EOF
-    echo "$SUDO_PASSWORD" | sudo -S cat /tmp/frontend_config.yaml >> "$HA_CONFIG_DIR/configuration.yaml"
+    sudo cat /tmp/frontend_config.yaml >> "$HA_CONFIG_DIR/configuration.yaml"
     rm /tmp/frontend_config.yaml
 fi
 
@@ -178,8 +177,8 @@ print_success "Frontend configuration updated"
 
 # Set proper permissions (already in deploy.sh, but as a safeguard if run standalone)
 print_status "Setting proper permissions..."
-echo "$SUDO_PASSWORD" | sudo -S chown -R turtle:turtle "$HA_CONFIG_DIR"
-echo "$SUDO_PASSWORD" | sudo -S chmod -R 755 "$HA_CONFIG_DIR"
+sudo chown -R turtle:turtle "$HA_CONFIG_DIR"
+sudo chmod -R 755 "$HA_CONFIG_DIR"
 
 # Restart Home Assistant
 print_status "Restarting Home Assistant..."

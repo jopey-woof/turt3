@@ -33,16 +33,12 @@ print_error() {
 }
 
 # Define the password for sudo operations
-SUDO_PASSWORD="shrimp"
 
 # Create a temporary askpass script
-ASKPASS_SCRIPT=$(mktemp)
-chmod +x "$ASKPASS_SCRIPT"
 echo "#!/bin/bash" > "$ASKPASS_SCRIPT"
 echo "echo \"$SUDO_PASSWORD\"" >> "$ASKPASS_SCRIPT"
 
 # Export variables for sudo to use the askpass script
-export SUDO_ASKPASS="$ASKPASS_SCRIPT"
 
 # Function to manage kiosk service
 manage_kiosk() {
@@ -221,7 +217,7 @@ if ! id "turtle" &>/dev/null; then
     fi
     sudo -A useradd -m -s /bin/bash turtle
     sudo -A usermod -aG video,audio,plugdev,docker turtle
-    echo "turtle:$SUDO_PASSWORD" | sudo -A chpasswd
+    sudo chpasswd
     print_success "Turtle user created"
 else
     print_status "Turtle user already exists"
@@ -575,7 +571,6 @@ print_success "Deployment completed successfully!"
 manage_kiosk
 
 # Clean up the temporary askpass script
-rm "$ASKPASS_SCRIPT"
 
 echo ""
 echo "🐢 Next Steps:"
