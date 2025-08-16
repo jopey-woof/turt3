@@ -116,31 +116,6 @@ if [[ -f "$HA_CONFIG_DIR/configuration.yaml" ]]; then
     print_status "Backup created: configuration.yaml.backup.$(date +%Y%m%d_%H%M%S)"
 fi
 
-# Create plugins configuration file
-print_status "Creating plugins configuration file..."
-# Use sudo -S cat and sudo -S mv
-sudo cat > /tmp/plugins.yaml << 'EOF'
-# Mushroom Cards and Kiosk Mode Configuration
-lovelace:
-  resources:
-    - url: /hacsfiles/mushroom/mushroom.js
-      type: module
-    - url: /local/www/kiosk-mode/kiosk-mode.js
-      type: module
-EOF
-sudo mv /tmp/plugins.yaml "$HA_CONFIG_DIR/packages/plugins.yaml"
-
-print_success "Plugins configuration file created"
-
-# Update main configuration.yaml to include packages
-print_status "Updating main configuration..."
-if ! grep -q "packages: !include_dir_named packages" "$HA_CONFIG_DIR/configuration.yaml"; then
-    # Add packages line after homeassistant section - use sudo -S sed
-    sudo sed -i '/^homeassistant:/,/^[^ ]/ { /^[^ ]/!d; /^homeassistant:/!d; }' "$HA_CONFIG_DIR/configuration.yaml"
-    sudo sed -i '/^homeassistant:/a\  packages: !include_dir_named packages' "$HA_CONFIG_DIR/configuration.yaml"
-    print_success "Added packages configuration to main config"
-fi
-
 # Set proper permissions (already in deploy.sh, but as a safeguard if run standalone)
 print_status "Setting proper permissions..."
 sudo chown -R turtle:turtle "$HA_CONFIG_DIR"

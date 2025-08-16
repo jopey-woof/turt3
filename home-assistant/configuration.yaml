@@ -117,6 +117,11 @@ notify:
 # Lovelace dashboard (simplified configuration)
 lovelace:
   mode: storage
+  resources:
+    - url: /hacsfiles/mushroom/mushroom.js
+      type: module
+    - url: /local/www/kiosk-mode/kiosk-mode.js
+      type: module
 
 # Input controls for system management
 input_boolean:
